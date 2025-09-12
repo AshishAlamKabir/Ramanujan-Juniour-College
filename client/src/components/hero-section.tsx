@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Star } from "lucide-react";
+import { Link } from "wouter";
 
 export default function HeroSection() {
   return (
@@ -46,17 +47,19 @@ export default function HeroSection() {
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row justify-center gap-4 mt-12">
             <Button 
+              asChild
               className="bg-accent text-accent-foreground px-8 py-3 rounded-lg font-semibold hover:bg-accent/90 transition-colors"
               data-testid="cta-explore-programs"
             >
-              Explore Programs
+              <Link href="/academics">Explore Programs</Link>
             </Button>
             <Button 
+              asChild
               variant="outline"
               className="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-primary transition-colors"
               data-testid="cta-campus-tour"
             >
-              Campus Tour
+              <Link href="/about">Campus Tour</Link>
             </Button>
           </div>
         </div>
