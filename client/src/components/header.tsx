@@ -99,8 +99,9 @@ export default function Header() {
                       </NavigationMenuContent>
                     </>
                   ) : (
-                    <Link href={item.href}>
-                      <NavigationMenuLink
+                    <NavigationMenuLink asChild>
+                      <Link
+                        href={item.href}
                         className={cn(
                           "group inline-flex h-9 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50",
                           location === item.href && "text-primary bg-accent/50"
@@ -108,8 +109,8 @@ export default function Header() {
                         data-testid={`nav-${item.name.toLowerCase()}`}
                       >
                         {item.name}
-                      </NavigationMenuLink>
-                    </Link>
+                      </Link>
+                    </NavigationMenuLink>
                   )}
                 </NavigationMenuItem>
               ))}
@@ -133,7 +134,9 @@ export default function Header() {
                         "text-foreground hover:text-primary transition-colors py-2 text-lg font-medium",
                         location === item.href && "text-primary"
                       )}
-                      onClick={() => setIsOpen(false)}
+                      onClick={() => {
+                        setTimeout(() => setIsOpen(false), 100);
+                      }}
                       data-testid={`mobile-nav-${item.name.toLowerCase()}`}
                     >
                       {item.name}
@@ -145,7 +148,9 @@ export default function Header() {
                             key={subItem.name}
                             href={subItem.href}
                             className="block text-muted-foreground hover:text-primary transition-colors py-1"
-                            onClick={() => setIsOpen(false)}
+                            onClick={() => {
+                        setTimeout(() => setIsOpen(false), 100);
+                      }}
                             data-testid={`mobile-nav-sub-${subItem.name.toLowerCase().replace(/\s+/g, '-')}`}
                           >
                             {subItem.name}
