@@ -33,7 +33,9 @@ Request to parents/guardians : :
 
   const previewMessage = `This prospectus is intended to give all the necessary information about our system of imparting excellent education to the sincere and devoted students wishing for a successful career and shine in today's competitive world. When a drop of water falls into a river, it has no identity, but when it falls on the leaf of a lotus, it shines like a pearl! So choose the best place where you can shine!
 Our teachers are dedicated, hardworking and sincere. They teach with such efficacy that the question of private tuitions doesnot arise.
-Our students qualify in Medical and Engineering entrance examinations including IIT, ISAT(2011) & PMT without private coaching. Our college class-room teaching is complete and conceptual thus private coaching is not required...`;
+Our students qualify in Medical and Engineering entrance examinations including IIT, ISAT(2011) & PMT without private coaching. Our college class-room teaching is complete and conceptual thus private coaching is not required.The students who go for private tuitions are not at all welcome to our college because it is important to understand that tuitions will not solve the problems. It is merely a waste of self-study hours. Emotionally immature and socially handicapped students fail in life. I have tasted the bitterness of failure several times in my life and this has taught me the three 'D's which are essential for success- "Desire, Dedication and Determination". Imbibing these values in one's life will bear the sweet fruits of success. I want my students to be confident of their abilities, without any inferiority or superioty complex. There is no short cut to success- the sooner you learn this, the better. So I welcome all those students who are sincere, dedicated, respectful, hardwoking, self-reliant, social, obedient, punctual and cultured to "Ramanujan Junior College".
+
+In every Academic Session coaching classes along with regular classes and entrance based tests are held every Saturday...`;
 
   return (
     <section className="hero-bg text-white relative overflow-hidden">
