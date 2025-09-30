@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertNoticeSchema, insertEventSchema, insertNewsSchema, insertDepartmentSchema, insertCourseSchema, insertFacultySchema, insertFacilitySchema } from "@shared/schema";
+import { insertNoticeSchema, insertEventSchema, insertNewsSchema, insertDepartmentSchema, insertCourseSchema, insertFacultySchema, insertFacilitySchema, insertGalleryImageSchema } from "@shared/schema";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -274,6 +274,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid data", errors: error.errors });
       }
       res.status(500).json({ message: "Failed to create facility" });
+    }
+  });
+
+  // Gallery Image routes
+  app.get("/api/gallery", async (req, res) => {
+    try {
+      const images = await storage.getGalleryImages();
+      res.json(images);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch gallery images" });
+    }
+  });
+
+  app.get("/api/gallery/:id", async (req, res) => {
+    try {
+      const image = await storage.getGalleryImage(req.params.id);
+      if (!image) {
+        return res.status(404).json({ message: "Gallery image not found" });
+      }
+      res.json(image);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch gallery image" });
+    }
+  });
+
+  app.post("/api/gallery", async (req, res) => {
+    try {
+      const validatedData = insertGalleryImageSchema.parse(req.body);
+      const image = await storage.createGalleryImage(validatedData);
+      res.status(201).json(image);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create gallery image" });
+    }
+  });
+
+  app.delete("/api/gallery/:id", async (req, res) => {
+    try {
+      const success = await storage.deleteGalleryImage(req.params.id);
+      if (!success) {
+        return res.status(404).json({ message: "Gallery image not found" });
+      }
+      res.json({ message: "Gallery image deleted successfully" });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete gallery image" });
     }
   });
 

@@ -1,5 +1,6 @@
 // import { Helmet } from "react-helmet-async";
 import HeroSection from "@/components/hero-section";
+import GalleryCarousel from "@/components/gallery-carousel";
 import NoticeBoard from "@/components/notice-board";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -19,6 +20,9 @@ export default function Home() {
 
       {/* Hero Section */}
       <HeroSection />
+
+      {/* Gallery Carousel */}
+      <GalleryCarousel />
 
       {/* Notice Board & Quick Links */}
       <NoticeBoard />

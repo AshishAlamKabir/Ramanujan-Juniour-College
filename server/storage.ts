@@ -1,4 +1,4 @@
-import { type User, type InsertUser, type Notice, type InsertNotice, type Event, type InsertEvent, type News, type InsertNews, type Department, type InsertDepartment, type Course, type InsertCourse, type Faculty, type InsertFaculty, type Facility, type InsertFacility } from "@shared/schema";
+import { type User, type InsertUser, type Notice, type InsertNotice, type Event, type InsertEvent, type News, type InsertNews, type Department, type InsertDepartment, type Course, type InsertCourse, type Faculty, type InsertFaculty, type Facility, type InsertFacility, type GalleryImage, type InsertGalleryImage } from "@shared/schema";
 import { randomUUID } from "crypto";
 
 export interface IStorage {
@@ -45,6 +45,12 @@ export interface IStorage {
   getFacility(id: string): Promise<Facility | undefined>;
   getFacilitiesByCategory(category: string): Promise<Facility[]>;
   createFacility(facility: InsertFacility): Promise<Facility>;
+  
+  // Gallery Image methods
+  getGalleryImages(): Promise<GalleryImage[]>;
+  getGalleryImage(id: string): Promise<GalleryImage | undefined>;
+  createGalleryImage(image: InsertGalleryImage): Promise<GalleryImage>;
+  deleteGalleryImage(id: string): Promise<boolean>;
 }
 
 export class MemStorage implements IStorage {
@@ -56,6 +62,7 @@ export class MemStorage implements IStorage {
   private courses: Map<string, Course>;
   private faculty: Map<string, Faculty>;
   private facilities: Map<string, Facility>;
+  private galleryImages: Map<string, GalleryImage>;
 
   constructor() {
     this.users = new Map();
@@ -66,6 +73,7 @@ export class MemStorage implements IStorage {
     this.courses = new Map();
     this.faculty = new Map();
     this.facilities = new Map();
+    this.galleryImages = new Map();
     
     // Initialize with some basic data structure
     this.initializeData();
@@ -292,6 +300,35 @@ export class MemStorage implements IStorage {
     };
     this.facilities.set(id, facility);
     return facility;
+  }
+
+  // Gallery Image methods
+  async getGalleryImages(): Promise<GalleryImage[]> {
+    return Array.from(this.galleryImages.values())
+      .filter(image => image.isActive)
+      .sort((a, b) => (a.order || 0) - (b.order || 0));
+  }
+
+  async getGalleryImage(id: string): Promise<GalleryImage | undefined> {
+    return this.galleryImages.get(id);
+  }
+
+  async createGalleryImage(insertImage: InsertGalleryImage): Promise<GalleryImage> {
+    const id = randomUUID();
+    const image: GalleryImage = {
+      ...insertImage,
+      id,
+      caption: insertImage.caption || null,
+      order: insertImage.order || 0,
+      isActive: insertImage.isActive !== undefined ? insertImage.isActive : true,
+      createdAt: new Date()
+    };
+    this.galleryImages.set(id, image);
+    return image;
+  }
+
+  async deleteGalleryImage(id: string): Promise<boolean> {
+    return this.galleryImages.delete(id);
   }
 }
 
