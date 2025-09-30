@@ -20,7 +20,6 @@ export default function HeroSection() {
             <h1 className="text-5xl md:text-6xl font-bold mb-4 font-serif" data-testid="college-name">
               Ramanujan College
             </h1>
-            <p className="text-xl md:text-2xl opacity-90 mb-2" data-testid="university-affiliation">University of Delhi</p>
             <p className="text-lg opacity-80" data-testid="vision-statement">Discover, Empower, Transform: Building a Better World</p>
           </div>
 
