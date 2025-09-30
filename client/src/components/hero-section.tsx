@@ -66,8 +66,8 @@ Our students qualify in Medical and Engineering entrance examinations including 
             </div>
             
             {/* Principal's Message */}
-            <div className="flex-1 text-center md:text-left">
-              <p className="text-base md:text-lg leading-relaxed mb-4 opacity-95 whitespace-pre-line" data-testid="text-principal-message">
+            <div className="flex-1 text-center">
+              <p className="text-base md:text-lg leading-relaxed mb-4 opacity-95 whitespace-pre-line text-justify" data-testid="text-principal-message">
                 {showFullMessage ? fullMessage : previewMessage}
               </p>
               
