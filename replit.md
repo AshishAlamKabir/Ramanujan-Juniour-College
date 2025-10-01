@@ -50,6 +50,14 @@ Preferred communication style: Simple, everyday language.
 - **Code Quality**: TypeScript strict mode with comprehensive type checking
 - **Path Aliases**: Configured for clean imports (@/ for client, @shared for common code)
 - **Error Handling**: Runtime error overlay for development debugging
+- **Replit Configuration**: Configured with workflow on port 5000, allowedHosts enabled for proxy compatibility
+
+### Replit Environment Setup
+- **Workflow**: "Start application" runs `npm run dev` on port 5000 (webview)
+- **Dev Server**: Vite configured with `allowedHosts: true` for Replit proxy compatibility
+- **Host Configuration**: Server binds to 0.0.0.0:5000 to accept Replit proxy connections
+- **Storage**: Currently using in-memory storage (MemStorage) - can be switched to PostgreSQL when needed
+- **Deployment**: Configured for autoscale deployment with build and start scripts
 
 ## External Dependencies
 
