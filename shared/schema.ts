@@ -7,6 +7,11 @@ export const users = pgTable("users", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
+  fullName: text("full_name").notNull(),
+  email: text("email").notNull().unique(),
+  role: text("role").notNull().default("student"),
+  approvalStatus: text("approval_status").notNull().default("pending"),
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
 export const notices = pgTable("notices", {
@@ -102,9 +107,19 @@ export const galleryImages = pgTable("gallery_images", {
 });
 
 // Insert schemas
-export const insertUserSchema = createInsertSchema(users).pick({
-  username: true,
-  password: true,
+export const insertUserSchema = createInsertSchema(users).omit({
+  id: true,
+  createdAt: true,
+  approvalStatus: true,
+});
+
+export const registerUserSchema = insertUserSchema.extend({
+  role: z.enum(["student", "teacher", "admin", "management"]),
+});
+
+export const loginUserSchema = z.object({
+  username: z.string().min(1),
+  password: z.string().min(1),
 });
 
 export const insertNoticeSchema = createInsertSchema(notices).omit({
@@ -144,6 +159,8 @@ export const insertGalleryImageSchema = createInsertSchema(galleryImages).omit({
 
 // Types
 export type InsertUser = z.infer<typeof insertUserSchema>;
+export type RegisterUser = z.infer<typeof registerUserSchema>;
+export type LoginUser = z.infer<typeof loginUserSchema>;
 export type User = typeof users.$inferSelect;
 export type InsertNotice = z.infer<typeof insertNoticeSchema>;
 export type Notice = typeof notices.$inferSelect;

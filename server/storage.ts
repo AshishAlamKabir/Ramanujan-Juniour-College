@@ -5,7 +5,11 @@ export interface IStorage {
   // User methods
   getUser(id: string): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
+  getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
+  updateUserApprovalStatus(id: string, status: string): Promise<User | undefined>;
+  getPendingUsers(): Promise<User[]>;
+  getUsersByRole(role: string): Promise<User[]>;
   
   // Notice methods
   getNotices(): Promise<Notice[]>;
@@ -95,11 +99,43 @@ export class MemStorage implements IStorage {
     );
   }
 
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    return Array.from(this.users.values()).find(
+      (user) => user.email === email,
+    );
+  }
+
   async createUser(insertUser: InsertUser): Promise<User> {
     const id = randomUUID();
-    const user: User = { ...insertUser, id };
+    const user: User = { 
+      ...insertUser, 
+      id,
+      role: insertUser.role || "student",
+      approvalStatus: "pending",
+      createdAt: new Date()
+    };
     this.users.set(id, user);
     return user;
+  }
+
+  async updateUserApprovalStatus(id: string, status: string): Promise<User | undefined> {
+    const user = this.users.get(id);
+    if (!user) return undefined;
+    
+    const updatedUser: User = { ...user, approvalStatus: status };
+    this.users.set(id, updatedUser);
+    return updatedUser;
+  }
+
+  async getPendingUsers(): Promise<User[]> {
+    return Array.from(this.users.values())
+      .filter(user => user.approvalStatus === "pending")
+      .sort((a, b) => (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0));
+  }
+
+  async getUsersByRole(role: string): Promise<User[]> {
+    return Array.from(this.users.values())
+      .filter(user => user.role === role);
   }
 
   // Notice methods
