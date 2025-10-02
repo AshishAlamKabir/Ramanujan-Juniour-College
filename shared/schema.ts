@@ -106,6 +106,17 @@ export const galleryImages = pgTable("gallery_images", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+export const students = pgTable("students", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: text("name").notNull(),
+  rollNumber: text("roll_number").notNull().unique(),
+  studentId: text("student_id").notNull().unique(),
+  stream: text("stream").notNull(),
+  section: text("section").notNull(),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
@@ -157,6 +168,11 @@ export const insertGalleryImageSchema = createInsertSchema(galleryImages).omit({
   createdAt: true,
 });
 
+export const insertStudentSchema = createInsertSchema(students).omit({
+  id: true,
+  createdAt: true,
+});
+
 // Types
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type RegisterUser = z.infer<typeof registerUserSchema>;
@@ -178,3 +194,5 @@ export type InsertFacility = z.infer<typeof insertFacilitySchema>;
 export type Facility = typeof facilities.$inferSelect;
 export type InsertGalleryImage = z.infer<typeof insertGalleryImageSchema>;
 export type GalleryImage = typeof galleryImages.$inferSelect;
+export type InsertStudent = z.infer<typeof insertStudentSchema>;
+export type Student = typeof students.$inferSelect;
