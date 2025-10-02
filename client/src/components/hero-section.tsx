@@ -1,6 +1,7 @@
 import { User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import EventsCarousel from "@/components/events-carousel";
 
 export default function HeroSection() {
   const [showFullMessage, setShowFullMessage] = useState(false);
@@ -99,6 +100,11 @@ Request to parents/guardians : :
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Events Carousel Section */}
+      <div className="relative">
+        <EventsCarousel />
       </div>
     </section>
   );
