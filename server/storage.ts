@@ -84,8 +84,138 @@ export class MemStorage implements IStorage {
   }
 
   private initializeData() {
-    // Initialize empty collections - no mock data
-    // Real data would be populated through API endpoints or database migrations
+    // Initialize faculty data
+    const facultyData = [
+      // Finance
+      { name: "Mr. Lakhyajit Baruah", designation: "Teacher", qualification: "MBA", phone: "7002081338", specialization: "Finance", experience: null },
+      
+      // Accountancy / Business Studies
+      { name: "Mr. Satyabrata Chowdhury", designation: "Teacher", qualification: "M.Com", phone: "9864309793", specialization: "Accountancy / Business Studies", experience: null },
+      
+      // Psychology
+      { name: "Miss Gayatri Bora", designation: "Teacher", qualification: "M.A", phone: "9707203268", specialization: "Psychology", experience: null },
+      
+      // Anthropology
+      { name: "Mrs. Barnali Baishya", designation: "Teacher", qualification: "M.A", phone: "9678058469", specialization: "Anthropology", experience: 8 },
+      
+      // English
+      { name: "Mrs. Dolly Das", designation: "Teacher", qualification: "M.A, B.Ed", phone: "8486521418", specialization: "English", experience: 11 },
+      { name: "Dr. Karabi Bharali", designation: "Teacher", qualification: "M.A, B.Ed, Ph.D", phone: "9864458844", specialization: "English", experience: 22 },
+      { name: "Mrs. Sumi Khound", designation: "Teacher", qualification: "M.A", phone: "9435367751", specialization: "English", experience: 22 },
+      { name: "Mr. Nilutpal Sarma", designation: "Teacher", qualification: "M.A, B.Ed", phone: "9707911870", specialization: "English", experience: 9 },
+      { name: "Miss Suman Phukan", designation: "Teacher", qualification: "M.A", phone: "7002618978", specialization: "English", experience: 4 },
+      { name: "Mr. Kangkan Krishna Hazarika", designation: "Teacher", qualification: "M.A", phone: "7002238996", specialization: "English", experience: 7 },
+      { name: "Mrs. Kankana Sarmah", designation: "Teacher", qualification: "M.A (NET/SLET Qualified)", phone: "7002338271", specialization: "English", experience: 5 },
+      { name: "Miss Basabi Bora", designation: "Teacher", qualification: "M.A (NET)", phone: "8638957547", specialization: "English", experience: null },
+      
+      // Assamese
+      { name: "Mrs. Sangeeta Boruah Bora", designation: "Vice-Principal", qualification: "M.A", phone: "9864240898", specialization: "Assamese", experience: 17 },
+      { name: "Mr. Dipankar Sarma", designation: "Teacher", qualification: "M.A (NET Qualified)", phone: "7002735240", specialization: "Assamese", experience: 17 },
+      { name: "Mrs. Momee Devi Sarmah", designation: "Teacher", qualification: "M.A", phone: "9707298662", specialization: "Assamese", experience: 21 },
+      { name: "Mrs. Dipali Bora", designation: "Teacher", qualification: "M.A", phone: "8761839069", specialization: "Assamese", experience: 20 },
+      { name: "Mr. Saurav Deka", designation: "Teacher", qualification: "M.A (NET Qualified)", phone: "9706333739", specialization: "Assamese", experience: 10 },
+      
+      // Bengali
+      { name: "Miss Swapnali Guha", designation: "Teacher", qualification: "M.A", phone: "9957012537", specialization: "Bengali", experience: 14 },
+      
+      // Sanskrit
+      { name: "Mr. Netra Jyoti Mahanta", designation: "Teacher", qualification: "M.A", phone: "7399229981", specialization: "Sanskrit", experience: 18 },
+      
+      // Hindi
+      { name: "Miss Bharati Singh", designation: "Teacher", qualification: "M.A, D.El.Ed (NET Qualified)", phone: "7002896651", specialization: "Hindi", experience: 6 },
+      { name: "Miss Maina Kumari Ram", designation: "Teacher", qualification: "M.A", phone: "6003792515", specialization: "Hindi", experience: 4 },
+      { name: "Mrs. Mira Rai", designation: "Teacher", qualification: "M.A, D.El.Ed, DCA", phone: "8486345193", specialization: "Hindi", experience: 6 },
+      
+      // Physics
+      { name: "Mr. Prasanta Sarma", designation: "Teacher", qualification: "B.E", phone: "9435361063", specialization: "Physics", experience: 20 },
+      { name: "Mr. Chintu Moni Nath", designation: "Teacher", qualification: "B.Tech", phone: "8486920862", specialization: "Physics", experience: 10 },
+      { name: "Mr. Bipul Duarah", designation: "Teacher", qualification: "M.Sc", phone: "8638284220", specialization: "Physics", experience: 8 },
+      { name: "Mr. Ankit Saha", designation: "Teacher", qualification: "M.Sc", phone: "8638227166", specialization: "Physics", experience: null },
+      { name: "Mr. Ujjal Kumar Borah", designation: "Teacher", qualification: "M.Sc", phone: "8638823431", specialization: "Physics", experience: null },
+      { name: "Mr. Ishan Baruah", designation: "Lab Instructor", qualification: "B.Sc", phone: "8638550232", specialization: "Physics", experience: null },
+      
+      // Chemistry
+      { name: "Mr. Dilip Kumar Borah", designation: "Principal", qualification: "M.Sc, B.Ed (NET Qualified)", phone: "9864750236", specialization: "Chemistry", experience: 27 },
+      { name: "Mr. Parag Paran Saikia", designation: "Teacher", qualification: "M.Sc", phone: "8486753110", specialization: "Chemistry", experience: 9 },
+      { name: "Mr. Tony Das", designation: "Teacher", qualification: "M.Sc (NET qualified)", phone: "7002875434", specialization: "Chemistry", experience: 6 },
+      { name: "Mr. Jitendra Sarma", designation: "Teacher", qualification: "M.Sc", phone: "8472040046", specialization: "Chemistry", experience: 4 },
+      { name: "Mr. Jhulan Bordoloi", designation: "Teacher", qualification: "M.Sc", phone: "8724895188", specialization: "Chemistry", experience: 9 },
+      { name: "Mr. Deepjyoti Bora", designation: "Lab Instructor", qualification: "M.Sc", phone: "7578917673", specialization: "Chemistry", experience: null },
+      { name: "Mr. Shashank Agarwal", designation: "Teacher", qualification: "M.Sc", phone: "8638079180", specialization: "Chemistry", experience: 2 },
+      
+      // Botany
+      { name: "Mrs. Urmimala Borah", designation: "Teacher", qualification: "M.Sc (Microbiology), PGDCA", phone: "7638065580", specialization: "Botany", experience: 5 },
+      { name: "Mrs. Rashmi Rekha Saikia", designation: "Teacher", qualification: "M.Sc, B.Ed", phone: "8638437094", specialization: "Botany", experience: 9 },
+      { name: "Mr. Sheikh Mehe Abjan", designation: "Teacher", qualification: "M.Sc", phone: "8638158267", specialization: "Botany", experience: 5 },
+      { name: "Mr. Tonmoy Jyoti Borah", designation: "Lab Instructor", qualification: "B.Sc, B.Ed", phone: "9101923237", specialization: "Botany", experience: null },
+      
+      // Zoology
+      { name: "Miss Nargis Sultana", designation: "Teacher", qualification: "M.Sc", phone: "9864632157", specialization: "Zoology", experience: 2 },
+      { name: "Miss Rajashree Devi", designation: "Teacher", qualification: "M.Sc", phone: "9101643045", specialization: "Zoology", experience: 2 },
+      { name: "Mr. Neeraj Bora", designation: "Teacher", qualification: "M.Sc", phone: "8486932588", specialization: "Zoology", experience: 4 },
+      { name: "Mr. Jagneswar Sarma", designation: "Teacher", qualification: "M.Sc, B.Ed", phone: "8638513395", specialization: "Zoology", experience: 4 },
+      
+      // Mathematics
+      { name: "Mr. Ranjit Kr. Borah", designation: "Teacher", qualification: "M.Sc, B.Ed", phone: "9864243466", specialization: "Mathematics", experience: 14 },
+      { name: "Mr. Debajit Das", designation: "Teacher", qualification: "M.Sc (Statistics), M.A (Economics)", phone: "9101500371", specialization: "Mathematics", experience: 20 },
+      { name: "Mr. Parag Borah", designation: "Teacher", qualification: "M.Sc, B.Ed", phone: "8822140960", specialization: "Mathematics", experience: 7 },
+      { name: "Mr. Koushtuve Moni Sarma", designation: "Teacher", qualification: "M.Sc, B.Ed", phone: "9101625639", specialization: "Mathematics", experience: 5 },
+      { name: "Mr. Hiranya Hazarika", designation: "Teacher", qualification: "M.Sc, M.Ed, M.Phil", phone: "8638680082", specialization: "Mathematics", experience: 16 },
+      { name: "Mr. Keshabananda Goswami", designation: "Teacher", qualification: "M.Sc", phone: "9101439918", specialization: "Mathematics", experience: null },
+      
+      // Statistics
+      { name: "Mr. Debajit Das", designation: "Teacher", qualification: "M.Sc (Statistics), M.A (Economics)", phone: "9101500371", specialization: "Statistics", experience: 20 },
+      
+      // Computer Science
+      { name: "Mr. Himan Jyoti Bairagi", designation: "Teacher", qualification: "MCA, D.El.Ed", phone: "9706608750", specialization: "Computer Science", experience: 6 },
+      { name: "Mrs. Gitashri Bordoloi", designation: "Teacher", qualification: "B.Tech", phone: "8638591016", specialization: "Computer Science", experience: 2 },
+      { name: "Mr. Jayanta Das", designation: "Teacher", qualification: "B.Tech", phone: "7002845523", specialization: "Computer Science", experience: null },
+      
+      // Economics
+      { name: "Mrs. Tribedi Sarma", designation: "Teacher", qualification: "M.A, B.Ed", phone: "9435970590", specialization: "Economics", experience: 20 },
+      { name: "Miss Bandana Das", designation: "Teacher", qualification: "M.A (NET qualified), PGDCA", phone: "9706505915", specialization: "Economics", experience: 4 },
+      
+      // Political Science
+      { name: "Mrs. Gongotri Saikia", designation: "Teacher", qualification: "M.A", phone: "9706867655", specialization: "Political Science", experience: 9 },
+      { name: "Mrs. Minakshi Bora", designation: "Teacher", qualification: "M.A, B.Ed", phone: "9000907079", specialization: "Political Science", experience: 8 },
+      
+      // Education
+      { name: "Mr. Mukul Hazarika", designation: "Teacher", qualification: "M.A", phone: "9854100672", specialization: "Education", experience: 15 },
+      { name: "Mr. Debashis Bora", designation: "Teacher", qualification: "M.A", phone: "9101687430", specialization: "Education", experience: 1 },
+      
+      // Logic & Philosophy
+      { name: "Mrs. Rajashree Neog Gayan", designation: "Teacher", qualification: "M.A, B.Ed, PGDCA", phone: "7577014523", specialization: "Logic & Philosophy", experience: 14 },
+      { name: "Mrs. Pronita Mahanta Sharma", designation: "Teacher", qualification: "M.A, B.Ed", phone: "7002299042", specialization: "Logic & Philosophy", experience: 15 },
+      
+      // Geography
+      { name: "Mrs. Madhumita Sarmah", designation: "Teacher", qualification: "M.A", phone: "9101456121", specialization: "Geography", experience: 10 },
+      { name: "Mr. Nabajyoti Nath", designation: "Teacher", qualification: "M.A (NET/SLET Qualified)", phone: "9706153818", specialization: "Geography", experience: 6 },
+      
+      // Sociology
+      { name: "Mrs. Swapna Devi", designation: "Teacher", qualification: "M.A", phone: "8876902318", specialization: "Sociology", experience: 14 },
+      { name: "Mrs. Tribeni Sarma", designation: "Teacher", qualification: "M.A", phone: "9435319860", specialization: "Sociology", experience: 16 },
+      
+      // History
+      { name: "Mr. Adiptya Nayak", designation: "Teacher", qualification: "M.A", phone: "8638598398", specialization: "History", experience: null }
+    ];
+
+    // Add faculty to storage
+    facultyData.forEach(data => {
+      const id = randomUUID();
+      const faculty: Faculty = {
+        id,
+        name: data.name,
+        designation: data.designation,
+        departmentId: null,
+        qualification: data.qualification,
+        experience: data.experience,
+        specialization: data.specialization,
+        email: null,
+        phone: data.phone,
+        isActive: true
+      };
+      this.faculty.set(id, faculty);
+    });
   }
 
   // User methods

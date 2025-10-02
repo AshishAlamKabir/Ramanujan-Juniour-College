@@ -316,31 +316,56 @@ export default function Academics() {
                 ))}
               </div>
             ) : (
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="space-y-8">
                 {faculty && faculty.length > 0 ? (
-                  faculty.slice(0, 9).map((member, index) => (
-                    <Card key={member.id} className="p-6 hover:shadow-lg transition-shadow" data-testid={`faculty-${index}`}>
-                      <CardHeader className="p-0 pb-4 text-center">
-                        <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-4">
-                          <Users className="w-8 h-8 text-primary-foreground" />
+                  (() => {
+                    // Group faculty by specialization
+                    const groupedFaculty = faculty.reduce((acc, member) => {
+                      const subject = member.specialization || "Other";
+                      if (!acc[subject]) {
+                        acc[subject] = [];
+                      }
+                      acc[subject].push(member);
+                      return acc;
+                    }, {} as Record<string, typeof faculty>);
+
+                    // Sort subjects alphabetically
+                    const sortedSubjects = Object.keys(groupedFaculty).sort();
+
+                    return sortedSubjects.map((subject) => (
+                      <div key={subject} className="space-y-4" data-testid={`subject-${subject.toLowerCase().replace(/\s+/g, '-')}`}>
+                        <h3 className="text-2xl font-semibold text-primary border-b-2 border-primary pb-2">
+                          {subject}
+                        </h3>
+                        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                          {groupedFaculty[subject].map((member, index) => (
+                            <Card key={member.id} className="p-4 hover:shadow-lg transition-shadow" data-testid={`faculty-${subject.toLowerCase().replace(/\s+/g, '-')}-${index}`}>
+                              <div className="space-y-2">
+                                <div className="flex items-start justify-between">
+                                  <div className="flex-1">
+                                    <h4 className="font-semibold text-base">{member.name}</h4>
+                                    <Badge variant="outline" className="mt-1">{member.designation}</Badge>
+                                  </div>
+                                </div>
+                                <div className="space-y-1 text-sm">
+                                  <p className="text-muted-foreground">{member.qualification}</p>
+                                  {member.experience && (
+                                    <div className="flex items-center text-muted-foreground">
+                                      <Award className="w-3 h-3 mr-1" />
+                                      {member.experience} years experience
+                                    </div>
+                                  )}
+                                  {member.phone && (
+                                    <p className="text-muted-foreground">📞 {member.phone}</p>
+                                  )}
+                                </div>
+                              </div>
+                            </Card>
+                          ))}
                         </div>
-                        <CardTitle className="text-lg">{member.name}</CardTitle>
-                        <Badge variant="outline">{member.designation}</Badge>
-                      </CardHeader>
-                      <CardContent className="p-0 text-center">
-                        <p className="text-sm text-muted-foreground mb-2">{member.qualification}</p>
-                        {member.specialization && (
-                          <p className="text-sm text-primary mb-4">{member.specialization}</p>
-                        )}
-                        {member.experience && (
-                          <div className="flex items-center justify-center text-sm text-muted-foreground">
-                            <Award className="w-4 h-4 mr-2" />
-                            {member.experience} years experience
-                          </div>
-                        )}
-                      </CardContent>
-                    </Card>
-                  ))
+                      </div>
+                    ));
+                  })()
                 ) : (
                   <div className="col-span-full text-center py-12">
                     <Users className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
