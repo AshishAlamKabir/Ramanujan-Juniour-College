@@ -31,10 +31,10 @@ export default function Home() {
       <section id="about" className="py-16 bg-background">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold mb-4 font-serif" data-testid="about-title">About Ramanujan College</h2>
+            <h2 className="text-4xl font-bold mb-4 font-serif" data-testid="about-title">About Ramanujan Junior College</h2>
             <p className="text-lg text-muted-foreground max-w-3xl mx-auto" data-testid="about-description">
-              Established in 1958, Ramanujan College has grown into a premier institution of higher education, 
-              committed to academic excellence and holistic development of students.
+              Founded in 2005, Ramanujan Junior College stands true to its motto - "Education, Development and Progress" 
+              with a long-cherished desire to impart quality education and pave the way for splendid careers.
             </p>
           </div>
 
@@ -44,26 +44,26 @@ export default function Home() {
               <div>
                 <h3 className="text-2xl font-semibold mb-4">Our Legacy</h3>
                 <p className="text-muted-foreground mb-4">
-                  Originally established as Deshbandhu College (Evening) in 1958, our institution was renamed 
-                  Ramanujan College in 2010 to honor the great mathematician Srinivasa Ramanujan. We became a 
-                  full-fledged day college in 2012, marking the beginning of unprecedented growth.
+                  Primarily started as a coaching institute named Ramanujan Academy in 2003, the institution 
+                  achieved immense response from society. In 2005, Ramanujan Junior College was established, 
+                  offering both Science and Arts streams.
                 </p>
                 <p className="text-muted-foreground">
-                  Our journey from an evening college to a NAAC A++ graded institution reflects our unwavering 
-                  commitment to educational excellence and innovation.
+                  Now operating dual services - Ramanujan Junior College and Ramanujan Academy - both are co-educational 
+                  institutions committed to preparing students for competitive examinations like JEE and medical entrance tests.
                 </p>
               </div>
 
               <div className="grid sm:grid-cols-2 gap-6">
                 <Card className="p-6 border">
-                  <div className="text-2xl font-bold text-primary mb-2">2016</div>
-                  <div className="text-sm font-medium mb-1">NAAC Grade A</div>
-                  <div className="text-xs text-muted-foreground">First accreditation</div>
+                  <div className="text-2xl font-bold text-primary mb-2">2003</div>
+                  <div className="text-sm font-medium mb-1">Academy Founded</div>
+                  <div className="text-xs text-muted-foreground">Ramanujan Academy</div>
                 </Card>
                 <Card className="p-6 border">
-                  <div className="text-2xl font-bold text-accent mb-2">26th</div>
-                  <div className="text-sm font-medium mb-1">NIRF Ranking</div>
-                  <div className="text-xs text-muted-foreground">2018 Achievement</div>
+                  <div className="text-2xl font-bold text-accent mb-2">2005</div>
+                  <div className="text-sm font-medium mb-1">College Established</div>
+                  <div className="text-xs text-muted-foreground">AHSEC Recognition</div>
                 </Card>
               </div>
             </div>
@@ -72,7 +72,7 @@ export default function Home() {
             <div className="lg:order-first">
               <img 
                 src="https://images.unsplash.com/photo-1562774053-701939374585?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&h=600" 
-                alt="Ramanujan College campus building" 
+                alt="Ramanujan Junior College campus building" 
                 className="rounded-xl shadow-lg w-full h-auto"
                 data-testid="college-image"
               />
@@ -86,11 +86,11 @@ export default function Home() {
                 <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-4">
                   <Eye className="w-8 h-8 text-primary-foreground" />
                 </div>
-                <h3 className="text-xl font-semibold">Vision</h3>
+                <h3 className="text-xl font-semibold">Our Motto</h3>
               </div>
               <p className="text-center text-muted-foreground">
-                "Discover, Empower, Transform: Building a Better World" - Our vision draws inspiration from 
-                mathematician Srinivasa Ramanujan and embodies our commitment to excellence.
+                "Education, Development and Progress" - Our motto reflects our commitment to imparting 
+                quality education and ensuring student success in competitive fields.
               </p>
             </Card>
 
@@ -99,10 +99,10 @@ export default function Home() {
                 <div className="w-16 h-16 bg-accent rounded-full flex items-center justify-center mx-auto mb-4">
                   <Target className="w-8 h-8 text-accent-foreground" />
                 </div>
-                <h3 className="text-xl font-semibold">Mission</h3>
+                <h3 className="text-xl font-semibold">Our Focus</h3>
               </div>
               <p className="text-center text-muted-foreground">
-                To empower students and teachers with knowledge, foster innovative learning, ignite critical thinking, 
+                Intensive coaching by permanent qualified faculty to prepare students for JEE, Medical entrance, 
                 improve employability, and nurture social responsibility.
               </p>
             </Card>

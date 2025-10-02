@@ -56,8 +56,8 @@ export default function Header() {
                 RC
               </div>
               <div>
-                <h1 className="text-lg font-bold text-foreground">Ramanujan College</h1>
-                <p className="text-xs text-muted-foreground">University of Delhi</p>
+                <h1 className="text-lg font-bold text-foreground">Ramanujan Junior College</h1>
+                <p className="text-xs text-muted-foreground">Assam (AHSEC)</p>
               </div>
             </div>
           </Link>
