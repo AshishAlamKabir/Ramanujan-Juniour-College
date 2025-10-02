@@ -24,19 +24,18 @@ export default function Header() {
       href: "/about",
       subItems: [
         { name: "History", href: "/about#history" },
-        { name: "Vision & Mission", href: "/about#vision" },
+        { name: "Objectives", href: "/about#objectives" },
         { name: "Leadership", href: "/about#leadership" },
-        { name: "Governance", href: "/about#governance" },
       ]
     },
     { 
       name: "Academics", 
       href: "/academics",
       subItems: [
-        { name: "Departments", href: "/academics#departments" },
-        { name: "Courses", href: "/academics#courses" },
-        { name: "Faculty", href: "/academics#faculty" },
-        { name: "Academic Calendar", href: "/academics#calendar" },
+        { name: "Streams", href: "/academics#streams" },
+        { name: "Subjects", href: "/academics#subjects" },
+        { name: "Teachers", href: "/academics#teachers" },
+        { name: "Students", href: "/academics#students" },
       ]
     },
     { name: "Admissions", href: "/admissions" },

@@ -102,147 +102,139 @@ export default function Academics() {
                 Academic Excellence
               </h1>
               <p className="text-xl opacity-90" data-testid="page-subtitle">
-                Comprehensive Programs Under Choice Based Credit System
+                Quality Education in Science, Commerce, and Arts Streams
               </p>
               <Badge className="mt-4 bg-accent text-accent-foreground" data-testid="cbcs-badge">
-                CBCS Framework
+                H.S. 1st & 2nd Year (AHSEC)
               </Badge>
             </div>
           </div>
         </section>
 
-        {/* Program Categories */}
-        <section id="programs" className="py-16">
+        {/* Streams */}
+        <section id="streams" className="py-16 bg-muted">
           <div className="container mx-auto px-4">
             <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold mb-4 font-serif" data-testid="programs-title">
-                Academic Programs
+              <h2 className="text-3xl font-bold mb-4 font-serif" data-testid="streams-title">
+                Academic Streams
               </h2>
               <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-                Explore our comprehensive range of undergraduate programs designed to provide 
-                quality education and prepare students for successful careers.
+                Three comprehensive streams offering specialized education for H.S. 1st & 2nd Year students
               </p>
             </div>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
-              {programCategories.map((category, index) => (
-                <Card key={category.title} className="hover:shadow-lg transition-shadow" data-testid={`program-category-${index}`}>
-                  <CardContent className="p-6 text-center">
-                    <div className={`w-12 h-12 bg-${category.color} rounded-lg flex items-center justify-center mx-auto mb-4`}>
-                      <category.icon className="w-6 h-6 text-primary-foreground" />
-                    </div>
-                    <h3 className="font-semibold mb-2">{category.title}</h3>
-                    <p className="text-sm text-muted-foreground mb-4">{category.description}</p>
-                    <Button variant="link" className="text-primary p-0 h-auto font-medium hover:underline" data-testid={`explore-${category.title.toLowerCase().replace(/\s+/g, '-')}`}>
-                      Explore Programs →
-                    </Button>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Departments */}
-        <section id="departments" className="py-16 bg-muted">
-          <div className="container mx-auto px-4">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold mb-4 font-serif" data-testid="departments-title">
-                Our Departments
-              </h2>
-              <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-                18 academic departments offering specialized education and research opportunities
-              </p>
-            </div>
-
-            {departmentsLoading ? (
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {[...Array(6)].map((_, i) => (
-                  <Card key={i} className="p-6">
-                    <Skeleton className="h-4 w-3/4 mb-4" />
-                    <Skeleton className="h-3 w-full mb-2" />
-                    <Skeleton className="h-3 w-2/3 mb-4" />
-                    <Skeleton className="h-8 w-24" />
-                  </Card>
-                ))}
-              </div>
-            ) : (
-              <>
-                {/* Featured Departments */}
-                <div className="mb-12">
-                  <h3 className="text-2xl font-semibold mb-8 text-center">Featured Departments</h3>
-                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {featuredDepartments.map((dept, index) => (
-                      <Card key={dept.title} className="p-6" data-testid={`featured-department-${index}`}>
-                        <div className="flex items-center space-x-3 mb-4">
-                          <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-                            <dept.icon className="w-5 h-5 text-primary-foreground" />
-                          </div>
-                          <h4 className="text-lg font-semibold">{dept.title}</h4>
-                        </div>
-                        <p className="text-sm text-muted-foreground mb-4">{dept.description}</p>
-                        <div className="flex items-center text-sm text-muted-foreground mb-4">
-                          <Users className="w-4 h-4 mr-2" />
-                          {dept.faculty}
-                        </div>
-                        <Button variant="link" className="text-primary p-0 h-auto font-medium hover:underline" data-testid={`view-department-${dept.title.toLowerCase().replace(/\s+/g, '-')}`}>
-                          View Department →
-                        </Button>
-                      </Card>
-                    ))}
+            <div className="grid md:grid-cols-3 gap-8">
+              <Card className="p-8 hover:shadow-xl transition-shadow" data-testid="stream-arts">
+                <div className="text-center mb-6">
+                  <div className="w-16 h-16 bg-primary rounded-lg flex items-center justify-center mx-auto mb-4">
+                    <GraduationCap className="w-8 h-8 text-primary-foreground" />
                   </div>
+                  <h3 className="text-2xl font-bold mb-3">Arts Stream</h3>
+                  <p className="text-muted-foreground mb-6">
+                    Comprehensive humanities education covering languages, social sciences, and liberal arts subjects.
+                  </p>
                 </div>
+                <div className="space-y-2">
+                  <h4 className="font-semibold text-sm text-primary mb-3">Core Subjects Include:</h4>
+                  <ul className="space-y-2 text-sm text-muted-foreground">
+                    <li className="flex items-center">
+                      <CheckCircle className="w-4 h-4 mr-2 text-primary" />
+                      English, Assamese, Hindi
+                    </li>
+                    <li className="flex items-center">
+                      <CheckCircle className="w-4 h-4 mr-2 text-primary" />
+                      Political Science
+                    </li>
+                    <li className="flex items-center">
+                      <CheckCircle className="w-4 h-4 mr-2 text-primary" />
+                      History, Geography
+                    </li>
+                    <li className="flex items-center">
+                      <CheckCircle className="w-4 h-4 mr-2 text-primary" />
+                      Economics, Education
+                    </li>
+                  </ul>
+                </div>
+              </Card>
 
-                {/* All Departments */}
-                {departments && departments.length > 0 && (
-                  <div>
-                    <h3 className="text-2xl font-semibold mb-8 text-center">All Departments</h3>
-                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                      {departments.map((dept, index) => (
-                        <Card key={dept.id} className="p-6 hover:shadow-lg transition-shadow" data-testid={`department-${index}`}>
-                          <CardHeader className="p-0 pb-4">
-                            <CardTitle className="flex items-center text-lg">
-                              <Building className="w-5 h-5 mr-2 text-primary" />
-                              {dept.name}
-                            </CardTitle>
-                          </CardHeader>
-                          <CardContent className="p-0">
-                            <p className="text-sm text-muted-foreground mb-4">{dept.description}</p>
-                            {dept.established && (
-                              <div className="flex items-center text-sm text-muted-foreground mb-2">
-                                <Calendar className="w-4 h-4 mr-2" />
-                                Established: {dept.established}
-                              </div>
-                            )}
-                            {dept.facultyCount && dept.facultyCount > 0 && (
-                              <div className="flex items-center text-sm text-muted-foreground mb-4">
-                                <Users className="w-4 h-4 mr-2" />
-                                {dept.facultyCount} Faculty Members
-                              </div>
-                            )}
-                            <Button variant="outline" size="sm" data-testid={`view-dept-details-${index}`}>
-                              View Details
-                            </Button>
-                          </CardContent>
-                        </Card>
-                      ))}
-                    </div>
+              <Card className="p-8 hover:shadow-xl transition-shadow border-2 border-primary" data-testid="stream-commerce">
+                <div className="text-center mb-6">
+                  <div className="w-16 h-16 bg-accent rounded-lg flex items-center justify-center mx-auto mb-4">
+                    <TrendingUp className="w-8 h-8 text-accent-foreground" />
                   </div>
-                )}
-              </>
-            )}
+                  <h3 className="text-2xl font-bold mb-3">Commerce Stream</h3>
+                  <p className="text-muted-foreground mb-6">
+                    Business-focused curriculum preparing students for careers in commerce, accounting, and management.
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <h4 className="font-semibold text-sm text-primary mb-3">Core Subjects Include:</h4>
+                  <ul className="space-y-2 text-sm text-muted-foreground">
+                    <li className="flex items-center">
+                      <CheckCircle className="w-4 h-4 mr-2 text-primary" />
+                      Accountancy
+                    </li>
+                    <li className="flex items-center">
+                      <CheckCircle className="w-4 h-4 mr-2 text-primary" />
+                      Business Studies
+                    </li>
+                    <li className="flex items-center">
+                      <CheckCircle className="w-4 h-4 mr-2 text-primary" />
+                      Economics
+                    </li>
+                    <li className="flex items-center">
+                      <CheckCircle className="w-4 h-4 mr-2 text-primary" />
+                      Mathematics/English
+                    </li>
+                  </ul>
+                </div>
+              </Card>
+
+              <Card className="p-8 hover:shadow-xl transition-shadow" data-testid="stream-science">
+                <div className="text-center mb-6">
+                  <div className="w-16 h-16 bg-secondary rounded-lg flex items-center justify-center mx-auto mb-4">
+                    <Atom className="w-8 h-8 text-secondary-foreground" />
+                  </div>
+                  <h3 className="text-2xl font-bold mb-3">Science Stream</h3>
+                  <p className="text-muted-foreground mb-6">
+                    Strong foundation in sciences and mathematics for engineering and medical entrance preparation.
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <h4 className="font-semibold text-sm text-primary mb-3">Core Subjects Include:</h4>
+                  <ul className="space-y-2 text-sm text-muted-foreground">
+                    <li className="flex items-center">
+                      <CheckCircle className="w-4 h-4 mr-2 text-primary" />
+                      Physics, Chemistry
+                    </li>
+                    <li className="flex items-center">
+                      <CheckCircle className="w-4 h-4 mr-2 text-primary" />
+                      Mathematics/Biology
+                    </li>
+                    <li className="flex items-center">
+                      <CheckCircle className="w-4 h-4 mr-2 text-primary" />
+                      Computer Science (optional)
+                    </li>
+                    <li className="flex items-center">
+                      <CheckCircle className="w-4 h-4 mr-2 text-primary" />
+                      English, Assamese
+                    </li>
+                  </ul>
+                </div>
+              </Card>
+            </div>
           </div>
         </section>
 
-        {/* Courses */}
-        <section id="courses" className="py-16">
+        {/* Subjects */}
+        <section id="subjects" className="py-16">
           <div className="container mx-auto px-4">
             <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold mb-4 font-serif" data-testid="courses-title">
-                Course Catalog
+              <h2 className="text-3xl font-bold mb-4 font-serif" data-testid="subjects-title">
+                Subjects Offered
               </h2>
               <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-                16+ undergraduate programs designed under the Choice Based Credit System
+                Wide range of subjects across Arts, Commerce, and Science streams for comprehensive education
               </p>
             </div>
 
@@ -289,9 +281,9 @@ export default function Academics() {
                 ) : (
                   <div className="col-span-full text-center py-12">
                     <BookOpen className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
-                    <h3 className="text-xl font-semibold mb-2">Course Information</h3>
+                    <h3 className="text-xl font-semibold mb-2">Subject Information</h3>
                     <p className="text-muted-foreground">
-                      Course details will be available soon. Please check back later.
+                      Detailed subject information will be available soon. Please check back later.
                     </p>
                   </div>
                 )}
@@ -300,15 +292,15 @@ export default function Academics() {
           </div>
         </section>
 
-        {/* Faculty */}
-        <section id="faculty" className="py-16 bg-muted">
+        {/* Teachers */}
+        <section id="teachers" className="py-16 bg-muted">
           <div className="container mx-auto px-4">
             <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold mb-4 font-serif" data-testid="faculty-title">
-                Our Faculty
+              <h2 className="text-3xl font-bold mb-4 font-serif" data-testid="teachers-title">
+                Our Teachers
               </h2>
               <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-                Distinguished educators and researchers committed to academic excellence
+                Dedicated and qualified permanent faculty committed to student success and competitive exam preparation
               </p>
             </div>
 
@@ -352,9 +344,9 @@ export default function Academics() {
                 ) : (
                   <div className="col-span-full text-center py-12">
                     <Users className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
-                    <h3 className="text-xl font-semibold mb-2">Faculty Information</h3>
+                    <h3 className="text-xl font-semibold mb-2">Teacher Information</h3>
                     <p className="text-muted-foreground">
-                      Faculty profiles will be available soon. Please check back later.
+                      Teacher profiles will be available soon. Please check back later.
                     </p>
                   </div>
                 )}
@@ -363,76 +355,91 @@ export default function Academics() {
           </div>
         </section>
 
-        {/* Academic Resources */}
-        <section id="calendar" className="py-16">
+        {/* Students */}
+        <section id="students" className="py-16">
           <div className="container mx-auto px-4">
             <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold mb-4 font-serif" data-testid="resources-title">
-                Academic Resources
+              <h2 className="text-3xl font-bold mb-4 font-serif" data-testid="students-title">
+                Student Life & Support
               </h2>
               <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-                Essential resources to support your academic journey
+                Comprehensive support system for student success in academics and competitive examinations
               </p>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-8">
-              <Card className="bg-primary text-primary-foreground p-8">
-                <h3 className="text-xl font-semibold mb-4">Academic Framework</h3>
-                <ul className="space-y-3">
-                  <li className="flex items-center">
-                    <CheckCircle className="w-5 h-5 mr-3" />
-                    Choice Based Credit System (CBCS)
-                  </li>
-                  <li className="flex items-center">
-                    <CheckCircle className="w-5 h-5 mr-3" />
-                    University of Delhi Syllabus
-                  </li>
-                  <li className="flex items-center">
-                    <CheckCircle className="w-5 h-5 mr-3" />
-                    Program & Course Outcomes
-                  </li>
-                  <li className="flex items-center">
-                    <CheckCircle className="w-5 h-5 mr-3" />
-                    Regular Academic Calendar
-                  </li>
-                </ul>
-                <Button 
-                  className="mt-6 bg-primary-foreground text-primary hover:bg-primary-foreground/90"
-                  data-testid="view-academic-calendar"
-                >
-                  View Academic Calendar
-                </Button>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+              <Card className="p-6 hover:shadow-lg transition-shadow">
+                <div className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center mb-4">
+                  <BookOpen className="w-6 h-6 text-primary-foreground" />
+                </div>
+                <h3 className="text-xl font-semibold mb-3">Regular Classes</h3>
+                <p className="text-muted-foreground">
+                  H.S. 1st & 2nd year regular classes with intensive coaching by permanent qualified faculty for comprehensive subject understanding.
+                </p>
               </Card>
 
-              <Card className="bg-accent text-accent-foreground p-8">
-                <h3 className="text-xl font-semibold mb-4">Student Support</h3>
-                <ul className="space-y-3">
-                  <li className="flex items-center">
-                    <CheckCircle className="w-5 h-5 mr-3" />
-                    Time Tables & Schedules
-                  </li>
-                  <li className="flex items-center">
-                    <CheckCircle className="w-5 h-5 mr-3" />
-                    Academic Counseling
-                  </li>
-                  <li className="flex items-center">
-                    <CheckCircle className="w-5 h-5 mr-3" />
-                    Career Guidance
-                  </li>
-                  <li className="flex items-center">
-                    <CheckCircle className="w-5 h-5 mr-3" />
-                    Research Opportunities
-                  </li>
-                </ul>
-                <Link href="/students">
-                  <Button 
-                    className="mt-6 bg-accent-foreground text-accent hover:bg-accent-foreground/90"
-                    data-testid="student-resources"
-                  >
-                    Student Resources
-                  </Button>
-                </Link>
+              <Card className="p-6 hover:shadow-lg transition-shadow">
+                <div className="w-12 h-12 bg-accent rounded-lg flex items-center justify-center mb-4">
+                  <Award className="w-6 h-6 text-accent-foreground" />
+                </div>
+                <h3 className="text-xl font-semibold mb-3">Entrance Preparation</h3>
+                <p className="text-muted-foreground">
+                  Special coaching for JEE (Mains & Advanced) and Medical entrance exams. Saturday entrance-based tests to ensure exam readiness.
+                </p>
               </Card>
+
+              <Card className="p-6 hover:shadow-lg transition-shadow">
+                <div className="w-12 h-12 bg-secondary rounded-lg flex items-center justify-center mb-4">
+                  <Users className="w-6 h-6 text-secondary-foreground" />
+                </div>
+                <h3 className="text-xl font-semibold mb-3">Guardian Interaction</h3>
+                <p className="text-muted-foreground">
+                  Regular interaction with guardians for monitoring student progress and building rapport between teachers and students.
+                </p>
+              </Card>
+
+              <Card className="p-6 hover:shadow-lg transition-shadow">
+                <div className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center mb-4">
+                  <Calendar className="w-6 h-6 text-primary-foreground" />
+                </div>
+                <h3 className="text-xl font-semibold mb-3">Periodical Tests</h3>
+                <p className="text-muted-foreground">
+                  Regular tests to help students stay mentally alert and emotionally balanced for competitive examinations.
+                </p>
+              </Card>
+
+              <Card className="p-6 hover:shadow-lg transition-shadow">
+                <div className="w-12 h-12 bg-accent rounded-lg flex items-center justify-center mb-4">
+                  <GraduationCap className="w-6 h-6 text-accent-foreground" />
+                </div>
+                <h3 className="text-xl font-semibold mb-3">Career Counseling</h3>
+                <p className="text-muted-foreground">
+                  Professional career guidance to help students make informed decisions about their academic and professional future.
+                </p>
+              </Card>
+
+              <Card className="p-6 hover:shadow-lg transition-shadow">
+                <div className="w-12 h-12 bg-secondary rounded-lg flex items-center justify-center mb-4">
+                  <CheckCircle className="w-6 h-6 text-secondary-foreground" />
+                </div>
+                <h3 className="text-xl font-semibold mb-3">Moral Education</h3>
+                <p className="text-muted-foreground">
+                  Focus on character development and moral education to prepare students for real-life situations and challenges.
+                </p>
+              </Card>
+            </div>
+
+            <div className="bg-primary text-primary-foreground rounded-lg p-8 text-center">
+              <h3 className="text-2xl font-bold mb-4">Student Guidelines</h3>
+              <p className="text-lg mb-6 opacity-90">
+                Students are expected to be sincere, dedicated, respectful, hardworking, self-reliant, social, obedient, punctual, and cultured. 
+                We emphasize self-study and discourage dependency on private tuitions.
+              </p>
+              <Link href="/students">
+                <Button className="bg-primary-foreground text-primary hover:bg-primary-foreground/90" data-testid="view-student-resources">
+                  View Student Resources →
+                </Button>
+              </Link>
             </div>
           </div>
         </section>
