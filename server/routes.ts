@@ -1,7 +1,7 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { registerUserSchema, loginUserSchema, insertNoticeSchema, insertEventSchema, insertNewsSchema, insertDepartmentSchema, insertCourseSchema, insertFacultySchema, insertFacilitySchema, insertGalleryImageSchema, type User } from "@shared/schema";
+import { registerUserSchema, loginUserSchema, insertNoticeSchema, insertEventSchema, insertNewsSchema, insertDepartmentSchema, insertCourseSchema, insertFacultySchema, insertFacilitySchema, insertGalleryImageSchema, insertStudentSchema, type User } from "@shared/schema";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
 import session from "express-session";
@@ -520,6 +520,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ message: "Gallery image deleted successfully" });
     } catch (error) {
       res.status(500).json({ message: "Failed to delete gallery image" });
+    }
+  });
+
+  // Student routes
+  app.get("/api/students", async (req, res) => {
+    try {
+      const { stream, section, year, graduationYear } = req.query;
+      const filters: any = {};
+      
+      if (stream && typeof stream === 'string') filters.stream = stream;
+      if (section && typeof section === 'string') filters.section = section;
+      if (year && typeof year === 'string') filters.year = parseInt(year);
+      if (graduationYear && typeof graduationYear === 'string') filters.graduationYear = parseInt(graduationYear);
+      
+      const students = await storage.getStudents(filters);
+      res.json(students);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch students" });
+    }
+  });
+
+  app.get("/api/students/:id", async (req, res) => {
+    try {
+      const student = await storage.getStudent(req.params.id);
+      if (!student) {
+        return res.status(404).json({ message: "Student not found" });
+      }
+      res.json(student);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch student" });
+    }
+  });
+
+  app.post("/api/students", async (req, res) => {
+    try {
+      const validatedData = insertStudentSchema.parse(req.body);
+      const student = await storage.createStudent(validatedData);
+      res.status(201).json(student);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create student" });
     }
   });
 

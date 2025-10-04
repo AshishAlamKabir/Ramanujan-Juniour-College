@@ -111,8 +111,12 @@ export const students = pgTable("students", {
   name: text("name").notNull(),
   rollNumber: text("roll_number").notNull().unique(),
   studentId: text("student_id").notNull().unique(),
+  photoUrl: text("photo_url"),
   stream: text("stream").notNull(),
   section: text("section").notNull(),
+  year: integer("year").notNull(),
+  percentage: text("percentage"),
+  graduationYear: integer("graduation_year"),
   isActive: boolean("is_active").default(true),
   createdAt: timestamp("created_at").defaultNow(),
 });

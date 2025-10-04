@@ -1,4 +1,4 @@
-import { type User, type InsertUser, type Notice, type InsertNotice, type Event, type InsertEvent, type News, type InsertNews, type Department, type InsertDepartment, type Course, type InsertCourse, type Faculty, type InsertFaculty, type Facility, type InsertFacility, type GalleryImage, type InsertGalleryImage } from "@shared/schema";
+import { type User, type InsertUser, type Notice, type InsertNotice, type Event, type InsertEvent, type News, type InsertNews, type Department, type InsertDepartment, type Course, type InsertCourse, type Faculty, type InsertFaculty, type Facility, type InsertFacility, type GalleryImage, type InsertGalleryImage, type Student, type InsertStudent } from "@shared/schema";
 import { randomUUID } from "crypto";
 
 export interface IStorage {
@@ -55,6 +55,11 @@ export interface IStorage {
   getGalleryImage(id: string): Promise<GalleryImage | undefined>;
   createGalleryImage(image: InsertGalleryImage): Promise<GalleryImage>;
   deleteGalleryImage(id: string): Promise<boolean>;
+  
+  // Student methods
+  getStudents(filters?: { stream?: string; section?: string; year?: number; graduationYear?: number }): Promise<Student[]>;
+  getStudent(id: string): Promise<Student | undefined>;
+  createStudent(student: InsertStudent): Promise<Student>;
 }
 
 export class MemStorage implements IStorage {
@@ -67,6 +72,7 @@ export class MemStorage implements IStorage {
   private faculty: Map<string, Faculty>;
   private facilities: Map<string, Facility>;
   private galleryImages: Map<string, GalleryImage>;
+  private students: Map<string, Student>;
 
   constructor() {
     this.users = new Map();
@@ -78,6 +84,7 @@ export class MemStorage implements IStorage {
     this.faculty = new Map();
     this.facilities = new Map();
     this.galleryImages = new Map();
+    this.students = new Map();
     
     // Initialize with some basic data structure
     this.initializeData();
@@ -495,6 +502,45 @@ export class MemStorage implements IStorage {
 
   async deleteGalleryImage(id: string): Promise<boolean> {
     return this.galleryImages.delete(id);
+  }
+
+  // Student methods
+  async getStudents(filters?: { stream?: string; section?: string; year?: number; graduationYear?: number }): Promise<Student[]> {
+    let students = Array.from(this.students.values()).filter(student => student.isActive);
+    
+    if (filters?.stream) {
+      students = students.filter(s => s.stream === filters.stream);
+    }
+    if (filters?.section) {
+      students = students.filter(s => s.section === filters.section);
+    }
+    if (filters?.year !== undefined) {
+      students = students.filter(s => s.year === filters.year);
+    }
+    if (filters?.graduationYear !== undefined) {
+      students = students.filter(s => s.graduationYear === filters.graduationYear);
+    }
+    
+    return students.sort((a, b) => a.name.localeCompare(b.name));
+  }
+
+  async getStudent(id: string): Promise<Student | undefined> {
+    return this.students.get(id);
+  }
+
+  async createStudent(insertStudent: InsertStudent): Promise<Student> {
+    const id = randomUUID();
+    const student: Student = {
+      ...insertStudent,
+      id,
+      photoUrl: insertStudent.photoUrl || null,
+      percentage: insertStudent.percentage || null,
+      graduationYear: insertStudent.graduationYear || null,
+      isActive: insertStudent.isActive !== undefined ? insertStudent.isActive : true,
+      createdAt: new Date()
+    };
+    this.students.set(id, student);
+    return student;
   }
 }
 
