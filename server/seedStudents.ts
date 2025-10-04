@@ -104,8 +104,9 @@ async function seedStudents() {
   
   for (let yearOffset = 0; yearOffset < academicYears; yearOffset++) {
     const admissionYear = currentYear - yearOffset;
-    const yearInCollege = yearOffset >= 2 ? null : (yearOffset === 0 ? 2 : 1);
-    const hasGraduated = yearOffset >= 2;
+    const isCurrentStudent = yearOffset < 2;
+    const yearInCollege = isCurrentStudent ? (yearOffset === 0 ? 2 : 1) : 2;
+    const hasGraduated = !isCurrentStudent;
     const graduationYear = hasGraduated ? admissionYear + 2 : null;
     
     console.log(`Generating students for admission year ${admissionYear}...`);
