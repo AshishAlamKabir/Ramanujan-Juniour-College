@@ -1,5 +1,8 @@
 import { type User, type InsertUser, type Notice, type InsertNotice, type Event, type InsertEvent, type News, type InsertNews, type Department, type InsertDepartment, type Course, type InsertCourse, type Faculty, type InsertFaculty, type Facility, type InsertFacility, type GalleryImage, type InsertGalleryImage, type Student, type InsertStudent } from "@shared/schema";
 import { randomUUID } from "crypto";
+import { db } from "./db";
+import { eq, and } from "drizzle-orm";
+import * as schema from "@shared/schema";
 
 export interface IStorage {
   // User methods
@@ -534,6 +537,7 @@ export class MemStorage implements IStorage {
       ...insertStudent,
       id,
       photoUrl: insertStudent.photoUrl || null,
+      marks: insertStudent.marks || null,
       percentage: insertStudent.percentage || null,
       graduationYear: insertStudent.graduationYear || null,
       isActive: insertStudent.isActive !== undefined ? insertStudent.isActive : true,
@@ -541,6 +545,213 @@ export class MemStorage implements IStorage {
     };
     this.students.set(id, student);
     return student;
+  }
+}
+
+export class PostgresStorage implements IStorage {
+  // User methods
+  async getUser(id: string): Promise<User | undefined> {
+    const result = await db.select().from(schema.users).where(eq(schema.users.id, id)).limit(1);
+    return result[0];
+  }
+
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    const result = await db.select().from(schema.users).where(eq(schema.users.username, username)).limit(1);
+    return result[0];
+  }
+
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    const result = await db.select().from(schema.users).where(eq(schema.users.email, email)).limit(1);
+    return result[0];
+  }
+
+  async createUser(user: InsertUser): Promise<User> {
+    const result = await db.insert(schema.users).values(user).returning();
+    return result[0];
+  }
+
+  async updateUserApprovalStatus(id: string, status: string): Promise<User | undefined> {
+    const result = await db.update(schema.users).set({ approvalStatus: status }).where(eq(schema.users.id, id)).returning();
+    return result[0];
+  }
+
+  async getPendingUsers(): Promise<User[]> {
+    return await db.select().from(schema.users).where(eq(schema.users.approvalStatus, "pending"));
+  }
+
+  async getUsersByRole(role: string): Promise<User[]> {
+    return await db.select().from(schema.users).where(eq(schema.users.role, role));
+  }
+
+  // Notice methods
+  async getNotices(): Promise<Notice[]> {
+    return await db.select().from(schema.notices).where(eq(schema.notices.isActive, true));
+  }
+
+  async getNotice(id: string): Promise<Notice | undefined> {
+    const result = await db.select().from(schema.notices).where(eq(schema.notices.id, id)).limit(1);
+    return result[0];
+  }
+
+  async createNotice(notice: InsertNotice): Promise<Notice> {
+    const result = await db.insert(schema.notices).values(notice).returning();
+    return result[0];
+  }
+
+  // Event methods
+  async getEvents(): Promise<Event[]> {
+    return await db.select().from(schema.events).where(eq(schema.events.isActive, true));
+  }
+
+  async getEvent(id: string): Promise<Event | undefined> {
+    const result = await db.select().from(schema.events).where(eq(schema.events.id, id)).limit(1);
+    return result[0];
+  }
+
+  async createEvent(event: InsertEvent): Promise<Event> {
+    const result = await db.insert(schema.events).values(event).returning();
+    return result[0];
+  }
+
+  // News methods
+  async getNews(): Promise<News[]> {
+    return await db.select().from(schema.news).where(eq(schema.news.isActive, true));
+  }
+
+  async getNewsItem(id: string): Promise<News | undefined> {
+    const result = await db.select().from(schema.news).where(eq(schema.news.id, id)).limit(1);
+    return result[0];
+  }
+
+  async getFeaturedNews(): Promise<News[]> {
+    return await db.select().from(schema.news).where(and(eq(schema.news.isActive, true), eq(schema.news.featured, true)));
+  }
+
+  async createNews(news: InsertNews): Promise<News> {
+    const result = await db.insert(schema.news).values(news).returning();
+    return result[0];
+  }
+
+  // Department methods
+  async getDepartments(): Promise<Department[]> {
+    return await db.select().from(schema.departments).where(eq(schema.departments.isActive, true));
+  }
+
+  async getDepartment(id: string): Promise<Department | undefined> {
+    const result = await db.select().from(schema.departments).where(eq(schema.departments.id, id)).limit(1);
+    return result[0];
+  }
+
+  async createDepartment(department: InsertDepartment): Promise<Department> {
+    const result = await db.insert(schema.departments).values(department).returning();
+    return result[0];
+  }
+
+  // Course methods
+  async getCourses(): Promise<Course[]> {
+    return await db.select().from(schema.courses).where(eq(schema.courses.isActive, true));
+  }
+
+  async getCourse(id: string): Promise<Course | undefined> {
+    const result = await db.select().from(schema.courses).where(eq(schema.courses.id, id)).limit(1);
+    return result[0];
+  }
+
+  async getCoursesByDepartment(departmentId: string): Promise<Course[]> {
+    return await db.select().from(schema.courses).where(and(eq(schema.courses.departmentId, departmentId), eq(schema.courses.isActive, true)));
+  }
+
+  async createCourse(course: InsertCourse): Promise<Course> {
+    const result = await db.insert(schema.courses).values(course).returning();
+    return result[0];
+  }
+
+  // Faculty methods
+  async getFaculty(): Promise<Faculty[]> {
+    return await db.select().from(schema.faculty).where(eq(schema.faculty.isActive, true));
+  }
+
+  async getFacultyMember(id: string): Promise<Faculty | undefined> {
+    const result = await db.select().from(schema.faculty).where(eq(schema.faculty.id, id)).limit(1);
+    return result[0];
+  }
+
+  async getFacultyByDepartment(departmentId: string): Promise<Faculty[]> {
+    return await db.select().from(schema.faculty).where(and(eq(schema.faculty.departmentId, departmentId), eq(schema.faculty.isActive, true)));
+  }
+
+  async createFaculty(faculty: InsertFaculty): Promise<Faculty> {
+    const result = await db.insert(schema.faculty).values(faculty).returning();
+    return result[0];
+  }
+
+  // Facility methods
+  async getFacilities(): Promise<Facility[]> {
+    return await db.select().from(schema.facilities).where(eq(schema.facilities.isActive, true));
+  }
+
+  async getFacility(id: string): Promise<Facility | undefined> {
+    const result = await db.select().from(schema.facilities).where(eq(schema.facilities.id, id)).limit(1);
+    return result[0];
+  }
+
+  async getFacilitiesByCategory(category: string): Promise<Facility[]> {
+    return await db.select().from(schema.facilities).where(and(eq(schema.facilities.category, category), eq(schema.facilities.isActive, true)));
+  }
+
+  async createFacility(facility: InsertFacility): Promise<Facility> {
+    const result = await db.insert(schema.facilities).values(facility).returning();
+    return result[0];
+  }
+
+  // Gallery Image methods
+  async getGalleryImages(): Promise<GalleryImage[]> {
+    return await db.select().from(schema.galleryImages).where(eq(schema.galleryImages.isActive, true));
+  }
+
+  async getGalleryImage(id: string): Promise<GalleryImage | undefined> {
+    const result = await db.select().from(schema.galleryImages).where(eq(schema.galleryImages.id, id)).limit(1);
+    return result[0];
+  }
+
+  async createGalleryImage(image: InsertGalleryImage): Promise<GalleryImage> {
+    const result = await db.insert(schema.galleryImages).values(image).returning();
+    return result[0];
+  }
+
+  async deleteGalleryImage(id: string): Promise<boolean> {
+    await db.delete(schema.galleryImages).where(eq(schema.galleryImages.id, id));
+    return true;
+  }
+
+  // Student methods
+  async getStudents(filters?: { stream?: string; section?: string; year?: number; graduationYear?: number }): Promise<Student[]> {
+    const conditions = [eq(schema.students.isActive, true)];
+    
+    if (filters?.stream) {
+      conditions.push(eq(schema.students.stream, filters.stream));
+    }
+    if (filters?.section) {
+      conditions.push(eq(schema.students.section, filters.section));
+    }
+    if (filters?.year !== undefined) {
+      conditions.push(eq(schema.students.year, filters.year));
+    }
+    if (filters?.graduationYear !== undefined) {
+      conditions.push(eq(schema.students.graduationYear, filters.graduationYear));
+    }
+    
+    return await db.select().from(schema.students).where(and(...conditions));
+  }
+
+  async getStudent(id: string): Promise<Student | undefined> {
+    const result = await db.select().from(schema.students).where(eq(schema.students.id, id)).limit(1);
+    return result[0];
+  }
+
+  async createStudent(student: InsertStudent): Promise<Student> {
+    const result = await db.insert(schema.students).values(student).returning();
+    return result[0];
   }
 }
 
