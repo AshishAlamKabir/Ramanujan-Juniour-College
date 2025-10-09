@@ -15,6 +15,10 @@ import Students from "@/pages/students";
 import Research from "@/pages/research";
 import News from "@/pages/news";
 import Contact from "@/pages/contact";
+import Teachers from "@/pages/teachers";
+import Login from "@/pages/login";
+import Signup from "@/pages/signup";
+import Dashboard from "@/pages/dashboard";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -26,11 +30,15 @@ function Router() {
           <Route path="/" component={Home} />
           <Route path="/about" component={About} />
           <Route path="/academics" component={Academics} />
+          <Route path="/teachers" component={Teachers} />
           <Route path="/admissions" component={Admissions} />
           <Route path="/students" component={Students} />
           <Route path="/research" component={Research} />
           <Route path="/news" component={News} />
           <Route path="/contact" component={Contact} />
+          <Route path="/login" component={Login} />
+          <Route path="/signup" component={Signup} />
+          <Route path="/dashboard" component={Dashboard} />
           <Route component={NotFound} />
         </Switch>
       </main>
