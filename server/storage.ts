@@ -259,6 +259,97 @@ export class MemStorage implements IStorage {
       };
       this.faculty.set(id, faculty);
     });
+
+    // Initialize student data with current and passed out students
+    const studentNames = [
+      "Ashish Alam Kabir", "Priya Sharma", "Rahul Deka", "Sneha Bora",
+      "Amit Singh", "Kavya Nath", "Rohan Das", "Anjali Saikia",
+      "Vikram Joshi", "Neha Baruah", "Arjun Patel", "Riya Mahanta",
+      "Sahil Kumar", "Pooja Bora", "Varun Sarma", "Divya Gogoi",
+      "Karan Dutta", "Megha Hazarika", "Nikhil Roy", "Sanjana Das",
+      "Aditya Sharma", "Priyanka Borah", "Harsh Gupta", "Tanvi Devi",
+      "Roshan Nath", "Ishita Sarmah", "Vishal Kumar", "Kritika Bora",
+      "Deepak Singh", "Shreya Baishya", "Akash Deka", "Nidhi Sarma",
+      "Manish Bora", "Ritika Das", "Siddharth Nath", "Ananya Saikia",
+      "Ayush Sharma", "Navya Gogoi", "Yash Dutta", "Sakshi Borah"
+    ];
+
+    const streams = ["SCIENCE", "COMMERCE", "ARTS"];
+    const sections = ["A", "B", "C"];
+    const years = [1, 2];
+    const statuses = ["current", "passed"];
+
+    let studentIndex = 0;
+    
+    // Create 50 current students
+    for (let i = 0; i < 50; i++) {
+      const year = years[Math.floor(Math.random() * years.length)];
+      const stream = streams[Math.floor(Math.random() * streams.length)];
+      const section = sections[Math.floor(Math.random() * sections.length)];
+      const name = studentNames[studentIndex % studentNames.length];
+      studentIndex++;
+      
+      const id = randomUUID();
+      const student: Student = {
+        id,
+        name: name,
+        rollNumber: `RJC${2024 + year}${String(i + 1).padStart(3, '0')}`,
+        studentId: `STD${String(10000 + i + 1)}`,
+        photoUrl: "https://via.placeholder.com/150",
+        gender: Math.random() > 0.5 ? "Male" : "Female",
+        dateOfBirth: new Date(2005 + Math.floor(Math.random() * 3), Math.floor(Math.random() * 12), Math.floor(Math.random() * 28) + 1),
+        admissionYear: 2024,
+        stream: stream,
+        section: section,
+        year: year,
+        rank: (i % 10) + 1,
+        contactNumber: `${7000000000 + Math.floor(Math.random() * 999999999)}`,
+        email: `${name.toLowerCase().replace(/\s+/g, '.')}@student.rjc.edu`,
+        address: `House No. ${Math.floor(Math.random() * 500)}, Jorhat, Assam`,
+        marks: null,
+        percentage: null,
+        graduationYear: null,
+        status: "current",
+        isActive: true,
+        createdAt: new Date()
+      };
+      this.students.set(id, student);
+    }
+
+    // Create 30 passed out students
+    for (let i = 0; i < 30; i++) {
+      const graduationYear = 2023 - Math.floor(Math.random() * 3);
+      const stream = streams[Math.floor(Math.random() * streams.length)];
+      const section = sections[Math.floor(Math.random() * sections.length)];
+      const name = studentNames[studentIndex % studentNames.length];
+      studentIndex++;
+      
+      const id = randomUUID();
+      const student: Student = {
+        id,
+        name: name,
+        rollNumber: `RJC${graduationYear}${String(i + 1).padStart(3, '0')}`,
+        studentId: `STD${String(20000 + i + 1)}`,
+        photoUrl: "https://via.placeholder.com/150",
+        gender: Math.random() > 0.5 ? "Male" : "Female",
+        dateOfBirth: new Date(2002 + Math.floor(Math.random() * 3), Math.floor(Math.random() * 12), Math.floor(Math.random() * 28) + 1),
+        admissionYear: graduationYear - 2,
+        stream: stream,
+        section: section,
+        year: 2,
+        rank: (i % 10) + 1,
+        contactNumber: `${7000000000 + Math.floor(Math.random() * 999999999)}`,
+        email: `${name.toLowerCase().replace(/\s+/g, '.')}@alumni.rjc.edu`,
+        address: `House No. ${Math.floor(Math.random() * 500)}, Jorhat, Assam`,
+        marks: "85%",
+        percentage: "85%",
+        graduationYear: graduationYear,
+        status: "passed",
+        isActive: true,
+        createdAt: new Date()
+      };
+      this.students.set(id, student);
+    }
   }
 
   // User methods
