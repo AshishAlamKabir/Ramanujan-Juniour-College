@@ -1,4 +1,4 @@
-import { type User, type InsertUser, type Notice, type InsertNotice, type Event, type InsertEvent, type News, type InsertNews, type Department, type InsertDepartment, type Course, type InsertCourse, type Faculty, type InsertFaculty, type Facility, type InsertFacility, type GalleryImage, type InsertGalleryImage, type Student, type InsertStudent } from "@shared/schema";
+import { type User, type InsertUser, type Notice, type InsertNotice, type Event, type InsertEvent, type News, type InsertNews, type Department, type InsertDepartment, type Course, type InsertCourse, type Faculty, type InsertFaculty, type Facility, type InsertFacility, type GalleryImage, type InsertGalleryImage, type Student, type InsertStudent, type TeacherRating, type InsertTeacherRating, type RatingLink, type InsertRatingLink, type StudentDue, type InsertStudentDue, type Payment, type InsertPayment } from "@shared/schema";
 import { randomUUID } from "crypto";
 import { db } from "./db";
 import { eq, and } from "drizzle-orm";
@@ -64,6 +64,27 @@ export interface IStorage {
   getStudents(filters?: { stream?: string; section?: string; year?: number; graduationYear?: number }): Promise<Student[]>;
   getStudent(id: string): Promise<Student | undefined>;
   createStudent(student: InsertStudent): Promise<Student>;
+  
+  // Teacher Rating methods
+  createRating(rating: InsertTeacherRating): Promise<TeacherRating>;
+  getRatingsByFaculty(facultyId: string): Promise<TeacherRating[]>;
+  updateFacultyRanking(): Promise<void>;
+  
+  // Rating Link methods
+  createRatingLink(link: InsertRatingLink): Promise<RatingLink>;
+  getRatingLink(token: string): Promise<RatingLink | undefined>;
+  getRatingLinksByFaculty(facultyId: string): Promise<RatingLink[]>;
+  
+  // Student Due methods
+  getStudentDues(studentId: string): Promise<StudentDue[]>;
+  createStudentDue(due: InsertStudentDue): Promise<StudentDue>;
+  updateDueStatus(id: string, status: string): Promise<StudentDue | undefined>;
+  
+  // Payment methods
+  createPayment(payment: InsertPayment): Promise<Payment>;
+  getPaymentsByStudent(studentId: string): Promise<Payment[]>;
+  getPendingPayments(): Promise<Payment[]>;
+  verifyPayment(id: string, verifiedBy: string): Promise<Payment | undefined>;
 }
 
 export class MemStorage implements IStorage {
@@ -77,6 +98,10 @@ export class MemStorage implements IStorage {
   private facilities: Map<string, Facility>;
   private galleryImages: Map<string, GalleryImage>;
   private students: Map<string, Student>;
+  private teacherRatings: Map<string, TeacherRating>;
+  private ratingLinks: Map<string, RatingLink>;
+  private studentDues: Map<string, StudentDue>;
+  private payments: Map<string, Payment>;
 
   constructor() {
     this.users = new Map();
@@ -89,6 +114,10 @@ export class MemStorage implements IStorage {
     this.facilities = new Map();
     this.galleryImages = new Map();
     this.students = new Map();
+    this.teacherRatings = new Map();
+    this.ratingLinks = new Map();
+    this.studentDues = new Map();
+    this.payments = new Map();
     
     // Initialize with some basic data structure
     this.initializeData();
@@ -223,6 +252,9 @@ export class MemStorage implements IStorage {
         specialization: data.specialization,
         email: null,
         phone: data.phone,
+        subject: data.specialization,
+        averageRating: "0",
+        rankPosition: null,
         isActive: true
       };
       this.faculty.set(id, faculty);
@@ -457,6 +489,9 @@ export class MemStorage implements IStorage {
       specialization: insertFaculty.specialization || null,
       email: insertFaculty.email || null,
       phone: insertFaculty.phone || null,
+      subject: insertFaculty.subject || null,
+      averageRating: insertFaculty.averageRating || "0",
+      rankPosition: insertFaculty.rankPosition || null,
       isActive: insertFaculty.isActive !== undefined ? insertFaculty.isActive : true
     };
     this.faculty.set(id, facultyMember);
@@ -561,6 +596,149 @@ export class MemStorage implements IStorage {
     };
     this.students.set(id, student);
     return student;
+  }
+
+  // Teacher Rating methods
+  async createRating(insertRating: InsertTeacherRating): Promise<TeacherRating> {
+    const id = randomUUID();
+    const rating: TeacherRating = {
+      ...insertRating,
+      id,
+      studentId: insertRating.studentId || null,
+      comment: insertRating.comment || null,
+      ratingLinkId: insertRating.ratingLinkId || null,
+      submittedAt: new Date()
+    };
+    this.teacherRatings.set(id, rating);
+    
+    await this.updateFacultyRanking();
+    return rating;
+  }
+
+  async getRatingsByFaculty(facultyId: string): Promise<TeacherRating[]> {
+    return Array.from(this.teacherRatings.values())
+      .filter(rating => rating.facultyId === facultyId)
+      .sort((a, b) => (b.submittedAt?.getTime() || 0) - (a.submittedAt?.getTime() || 0));
+  }
+
+  async updateFacultyRanking(): Promise<void> {
+    const facultyMembers = Array.from(this.faculty.values());
+    
+    for (const member of facultyMembers) {
+      const ratings = await this.getRatingsByFaculty(member.id);
+      if (ratings.length > 0) {
+        const sum = ratings.reduce((acc, r) => acc + r.ratingValue, 0);
+        const avg = (sum / ratings.length).toFixed(2);
+        member.averageRating = avg;
+      }
+    }
+    
+    const sortedFaculty = facultyMembers
+      .filter(f => f.averageRating && parseFloat(f.averageRating) > 0)
+      .sort((a, b) => parseFloat(b.averageRating || "0") - parseFloat(a.averageRating || "0"));
+    
+    sortedFaculty.forEach((member, index) => {
+      member.rankPosition = index + 1;
+      this.faculty.set(member.id, member);
+    });
+  }
+
+  // Rating Link methods
+  async createRatingLink(insertLink: InsertRatingLink): Promise<RatingLink> {
+    const id = randomUUID();
+    const link: RatingLink = {
+      ...insertLink,
+      id,
+      isActive: insertLink.isActive !== undefined ? insertLink.isActive : true,
+      expiresAt: insertLink.expiresAt || null,
+      createdAt: new Date()
+    };
+    this.ratingLinks.set(id, link);
+    return link;
+  }
+
+  async getRatingLink(token: string): Promise<RatingLink | undefined> {
+    return Array.from(this.ratingLinks.values()).find(link => link.linkToken === token);
+  }
+
+  async getRatingLinksByFaculty(facultyId: string): Promise<RatingLink[]> {
+    return Array.from(this.ratingLinks.values())
+      .filter(link => link.facultyId === facultyId)
+      .sort((a, b) => (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0));
+  }
+
+  // Student Due methods
+  async getStudentDues(studentId: string): Promise<StudentDue[]> {
+    return Array.from(this.studentDues.values())
+      .filter(due => due.studentId === studentId)
+      .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime());
+  }
+
+  async createStudentDue(insertDue: InsertStudentDue): Promise<StudentDue> {
+    const id = randomUUID();
+    const due: StudentDue = {
+      ...insertDue,
+      id,
+      description: insertDue.description || null,
+      createdAt: new Date()
+    };
+    this.studentDues.set(id, due);
+    return due;
+  }
+
+  async updateDueStatus(id: string, status: string): Promise<StudentDue | undefined> {
+    const due = this.studentDues.get(id);
+    if (!due) return undefined;
+    
+    const updatedDue: StudentDue = { ...due, status };
+    this.studentDues.set(id, updatedDue);
+    return updatedDue;
+  }
+
+  // Payment methods
+  async createPayment(insertPayment: InsertPayment): Promise<Payment> {
+    const id = randomUUID();
+    const payment: Payment = {
+      ...insertPayment,
+      id,
+      screenshotUrl: insertPayment.screenshotUrl || null,
+      paymentMethod: insertPayment.paymentMethod || "UPI",
+      verifiedBy: insertPayment.verifiedBy || null,
+      verifiedAt: insertPayment.verifiedAt || null,
+      paidAt: new Date(),
+      createdAt: new Date()
+    };
+    this.payments.set(id, payment);
+    return payment;
+  }
+
+  async getPaymentsByStudent(studentId: string): Promise<Payment[]> {
+    return Array.from(this.payments.values())
+      .filter(payment => payment.studentId === studentId)
+      .sort((a, b) => (b.paidAt?.getTime() || 0) - (a.paidAt?.getTime() || 0));
+  }
+
+  async getPendingPayments(): Promise<Payment[]> {
+    return Array.from(this.payments.values())
+      .filter(payment => payment.status === "pending")
+      .sort((a, b) => (b.paidAt?.getTime() || 0) - (a.paidAt?.getTime() || 0));
+  }
+
+  async verifyPayment(id: string, verifiedBy: string): Promise<Payment | undefined> {
+    const payment = this.payments.get(id);
+    if (!payment) return undefined;
+    
+    const updatedPayment: Payment = {
+      ...payment,
+      status: "verified",
+      verifiedBy,
+      verifiedAt: new Date()
+    };
+    this.payments.set(id, updatedPayment);
+    
+    await this.updateDueStatus(payment.dueId, "paid");
+    
+    return updatedPayment;
   }
 }
 
@@ -775,6 +953,119 @@ export class PostgresStorage implements IStorage {
 
   async createStudent(student: InsertStudent): Promise<Student> {
     const result = await db.insert(schema.students).values(student).returning();
+    return result[0];
+  }
+
+  // Teacher Rating methods
+  async createRating(rating: InsertTeacherRating): Promise<TeacherRating> {
+    const result = await db.insert(schema.teacherRatings).values(rating).returning();
+    await this.updateFacultyRanking();
+    return result[0];
+  }
+
+  async getRatingsByFaculty(facultyId: string): Promise<TeacherRating[]> {
+    return await db.select().from(schema.teacherRatings)
+      .where(eq(schema.teacherRatings.facultyId, facultyId))
+      .orderBy(schema.teacherRatings.submittedAt);
+  }
+
+  async updateFacultyRanking(): Promise<void> {
+    const facultyMembers = await db.select().from(schema.faculty);
+    
+    for (const member of facultyMembers) {
+      const ratings = await this.getRatingsByFaculty(member.id);
+      if (ratings.length > 0) {
+        const sum = ratings.reduce((acc, r) => acc + r.ratingValue, 0);
+        const avg = (sum / ratings.length).toFixed(2);
+        await db.update(schema.faculty)
+          .set({ averageRating: avg })
+          .where(eq(schema.faculty.id, member.id));
+      }
+    }
+    
+    const updatedFaculty = await db.select().from(schema.faculty);
+    const sortedFaculty = updatedFaculty
+      .filter(f => f.averageRating && parseFloat(f.averageRating) > 0)
+      .sort((a, b) => parseFloat(b.averageRating || "0") - parseFloat(a.averageRating || "0"));
+    
+    for (let i = 0; i < sortedFaculty.length; i++) {
+      await db.update(schema.faculty)
+        .set({ rankPosition: i + 1 })
+        .where(eq(schema.faculty.id, sortedFaculty[i].id));
+    }
+  }
+
+  // Rating Link methods
+  async createRatingLink(link: InsertRatingLink): Promise<RatingLink> {
+    const result = await db.insert(schema.ratingLinks).values(link).returning();
+    return result[0];
+  }
+
+  async getRatingLink(token: string): Promise<RatingLink | undefined> {
+    const result = await db.select().from(schema.ratingLinks)
+      .where(eq(schema.ratingLinks.linkToken, token))
+      .limit(1);
+    return result[0];
+  }
+
+  async getRatingLinksByFaculty(facultyId: string): Promise<RatingLink[]> {
+    return await db.select().from(schema.ratingLinks)
+      .where(eq(schema.ratingLinks.facultyId, facultyId))
+      .orderBy(schema.ratingLinks.createdAt);
+  }
+
+  // Student Due methods
+  async getStudentDues(studentId: string): Promise<StudentDue[]> {
+    return await db.select().from(schema.studentDues)
+      .where(eq(schema.studentDues.studentId, studentId))
+      .orderBy(schema.studentDues.dueDate);
+  }
+
+  async createStudentDue(due: InsertStudentDue): Promise<StudentDue> {
+    const result = await db.insert(schema.studentDues).values(due).returning();
+    return result[0];
+  }
+
+  async updateDueStatus(id: string, status: string): Promise<StudentDue | undefined> {
+    const result = await db.update(schema.studentDues)
+      .set({ status })
+      .where(eq(schema.studentDues.id, id))
+      .returning();
+    return result[0];
+  }
+
+  // Payment methods
+  async createPayment(payment: InsertPayment): Promise<Payment> {
+    const result = await db.insert(schema.payments).values(payment).returning();
+    return result[0];
+  }
+
+  async getPaymentsByStudent(studentId: string): Promise<Payment[]> {
+    return await db.select().from(schema.payments)
+      .where(eq(schema.payments.studentId, studentId))
+      .orderBy(schema.payments.paidAt);
+  }
+
+  async getPendingPayments(): Promise<Payment[]> {
+    return await db.select().from(schema.payments)
+      .where(eq(schema.payments.status, "pending"))
+      .orderBy(schema.payments.paidAt);
+  }
+
+  async verifyPayment(id: string, verifiedBy: string): Promise<Payment | undefined> {
+    const result = await db.update(schema.payments)
+      .set({ 
+        status: "verified",
+        verifiedBy,
+        verifiedAt: new Date()
+      })
+      .where(eq(schema.payments.id, id))
+      .returning();
+    
+    if (result[0]) {
+      await this.updateDueStatus(result[0].dueId, "paid");
+    }
+    
     return result[0];
   }
 }
