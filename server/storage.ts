@@ -61,7 +61,7 @@ export interface IStorage {
   deleteGalleryImage(id: string): Promise<boolean>;
   
   // Student methods
-  getStudents(filters?: { stream?: string; section?: string; year?: number; graduationYear?: number }): Promise<Student[]>;
+  getStudents(filters?: { stream?: string; section?: string; year?: number; graduationYear?: number; status?: string }): Promise<Student[]>;
   getStudent(id: string): Promise<Student | undefined>;
   createStudent(student: InsertStudent): Promise<Student>;
   
@@ -650,7 +650,7 @@ export class MemStorage implements IStorage {
   }
 
   // Student methods
-  async getStudents(filters?: { stream?: string; section?: string; year?: number; graduationYear?: number }): Promise<Student[]> {
+  async getStudents(filters?: { stream?: string; section?: string; year?: number; graduationYear?: number; status?: string }): Promise<Student[]> {
     let students = Array.from(this.students.values()).filter(student => student.isActive);
     
     if (filters?.stream) {
@@ -665,8 +665,11 @@ export class MemStorage implements IStorage {
     if (filters?.graduationYear !== undefined) {
       students = students.filter(s => s.graduationYear === filters.graduationYear);
     }
+    if (filters?.status) {
+      students = students.filter(s => s.status === filters.status);
+    }
     
-    return students.sort((a, b) => a.name.localeCompare(b.name));
+    return students.sort((a, b) => (a.rank || 999) - (b.rank || 999));
   }
 
   async getStudent(id: string): Promise<Student | undefined> {
