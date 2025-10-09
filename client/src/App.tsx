@@ -19,6 +19,8 @@ import Teachers from "@/pages/teachers";
 import Login from "@/pages/login";
 import Signup from "@/pages/signup";
 import Dashboard from "@/pages/dashboard";
+import RateTeacher from "@/pages/rate-teacher";
+import Payments from "@/pages/payments";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -39,6 +41,8 @@ function Router() {
           <Route path="/login" component={Login} />
           <Route path="/signup" component={Signup} />
           <Route path="/dashboard" component={Dashboard} />
+          <Route path="/rate/:token" component={RateTeacher} />
+          <Route path="/payments" component={Payments} />
           <Route component={NotFound} />
         </Switch>
       </main>
