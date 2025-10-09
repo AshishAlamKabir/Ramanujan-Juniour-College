@@ -679,6 +679,7 @@ export class MemStorage implements IStorage {
     const due: StudentDue = {
       ...insertDue,
       id,
+      status: insertDue.status || "pending",
       description: insertDue.description || null,
       createdAt: new Date()
     };
@@ -701,6 +702,7 @@ export class MemStorage implements IStorage {
     const payment: Payment = {
       ...insertPayment,
       id,
+      status: insertPayment.status || "pending",
       screenshotUrl: insertPayment.screenshotUrl || null,
       paymentMethod: insertPayment.paymentMethod || "UPI",
       verifiedBy: insertPayment.verifiedBy || null,

@@ -1,7 +1,7 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { registerUserSchema, loginUserSchema, insertNoticeSchema, insertEventSchema, insertNewsSchema, insertDepartmentSchema, insertCourseSchema, insertFacultySchema, insertFacilitySchema, insertGalleryImageSchema, insertStudentSchema, type User } from "@shared/schema";
+import { registerUserSchema, loginUserSchema, insertNoticeSchema, insertEventSchema, insertNewsSchema, insertDepartmentSchema, insertCourseSchema, insertFacultySchema, insertFacilitySchema, insertGalleryImageSchema, insertStudentSchema, insertTeacherRatingSchema, insertRatingLinkSchema, insertStudentDueSchema, insertPaymentSchema, type User } from "@shared/schema";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
 import session from "express-session";
@@ -587,6 +587,203 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid data", errors: error.errors });
       }
       res.status(500).json({ message: "Failed to create student" });
+    }
+  });
+
+  // Initialize Principal Account
+  app.post("/api/auth/init-principal", async (req, res) => {
+    try {
+      const existingPrincipal = await storage.getUserByEmail("DilipKumarBorah@gmail.com");
+      
+      if (existingPrincipal) {
+        return res.status(400).json({ message: "Principal account already exists" });
+      }
+      
+      const hashedPassword = await bcrypt.hash("Education@13", 10);
+      
+      const principal = await storage.createUser({
+        email: "DilipKumarBorah@gmail.com",
+        phoneNumber: "9864750236",
+        password: hashedPassword,
+        fullName: "Mr. Dilip Kumar Borah",
+        role: "principal"
+      });
+      
+      await storage.updateUserApprovalStatus(principal.id, "approved");
+      
+      const { password, ...principalWithoutPassword } = principal;
+      res.status(201).json({ 
+        message: "Principal account created successfully",
+        user: principalWithoutPassword 
+      });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to create principal account" });
+    }
+  });
+
+  // Teacher Rating routes
+  app.post("/api/ratings", async (req, res) => {
+    try {
+      const validatedData = insertTeacherRatingSchema.parse(req.body);
+      const rating = await storage.createRating(validatedData);
+      res.status(201).json(rating);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to submit rating" });
+    }
+  });
+
+  app.get("/api/ratings/faculty/:facultyId", async (req, res) => {
+    try {
+      const ratings = await storage.getRatingsByFaculty(req.params.facultyId);
+      res.json(ratings);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch ratings" });
+    }
+  });
+
+  // Rating Link routes
+  app.post("/api/rating-links", requireRole("management", "admin", "principal"), async (req, res) => {
+    try {
+      const validatedData = insertRatingLinkSchema.parse(req.body);
+      
+      if (!req.session.userId) {
+        return res.status(401).json({ message: "Authentication required" });
+      }
+      
+      const token = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+      
+      const link = await storage.createRatingLink({
+        ...validatedData,
+        linkToken: token,
+        createdBy: req.session.userId
+      });
+      
+      res.status(201).json(link);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create rating link" });
+    }
+  });
+
+  app.get("/api/rating-links/:token", async (req, res) => {
+    try {
+      const link = await storage.getRatingLink(req.params.token);
+      
+      if (!link) {
+        return res.status(404).json({ message: "Rating link not found" });
+      }
+      
+      if (!link.isActive) {
+        return res.status(400).json({ message: "Rating link is no longer active" });
+      }
+      
+      if (link.expiresAt && new Date(link.expiresAt) < new Date()) {
+        return res.status(400).json({ message: "Rating link has expired" });
+      }
+      
+      res.json(link);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch rating link" });
+    }
+  });
+
+  app.get("/api/rating-links/faculty/:facultyId", requireRole("management", "admin", "principal"), async (req, res) => {
+    try {
+      const links = await storage.getRatingLinksByFaculty(req.params.facultyId);
+      res.json(links);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch rating links" });
+    }
+  });
+
+  // Student Dues routes
+  app.get("/api/dues/student/:studentId", requireAuth, async (req, res) => {
+    try {
+      const dues = await storage.getStudentDues(req.params.studentId);
+      res.json(dues);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch student dues" });
+    }
+  });
+
+  app.post("/api/dues", requireRole("management", "admin", "principal"), async (req, res) => {
+    try {
+      const validatedData = insertStudentDueSchema.parse(req.body);
+      const due = await storage.createStudentDue(validatedData);
+      res.status(201).json(due);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create due" });
+    }
+  });
+
+  // Payment routes
+  app.post("/api/payments", requireAuth, async (req, res) => {
+    try {
+      const validatedData = insertPaymentSchema.parse(req.body);
+      const payment = await storage.createPayment(validatedData);
+      res.status(201).json(payment);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create payment" });
+    }
+  });
+
+  app.get("/api/payments/student/:studentId", requireAuth, async (req, res) => {
+    try {
+      const payments = await storage.getPaymentsByStudent(req.params.studentId);
+      res.json(payments);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch payments" });
+    }
+  });
+
+  app.get("/api/payments/pending", requireRole("management", "admin", "principal"), async (req, res) => {
+    try {
+      const payments = await storage.getPendingPayments();
+      res.json(payments);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch pending payments" });
+    }
+  });
+
+  app.post("/api/payments/:id/verify", requireRole("management", "admin", "principal"), async (req, res) => {
+    try {
+      if (!req.session.userId) {
+        return res.status(401).json({ message: "Authentication required" });
+      }
+      
+      const payment = await storage.verifyPayment(req.params.id, req.session.userId);
+      
+      if (!payment) {
+        return res.status(404).json({ message: "Payment not found" });
+      }
+      
+      res.json(payment);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to verify payment" });
+    }
+  });
+
+  // Get faculty with rankings (sorted by rank)
+  app.get("/api/faculty/ranked", async (req, res) => {
+    try {
+      const faculty = await storage.getFaculty();
+      const rankedFaculty = faculty
+        .filter(f => f.rankPosition !== null)
+        .sort((a, b) => (a.rankPosition || 0) - (b.rankPosition || 0));
+      res.json(rankedFaculty);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch ranked faculty" });
     }
   });
 
