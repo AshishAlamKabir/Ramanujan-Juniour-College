@@ -2,6 +2,7 @@ import { User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import EventsCarousel from "@/components/events-carousel";
+import principalImage from "@assets/image_1760023930701.png";
 
 export default function HeroSection() {
   const [showFullMessage, setShowFullMessage] = useState(false);
@@ -57,11 +58,14 @@ Request to parents/guardians : :
           </h2>
           
           <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
-            {/* Principal's Image Placeholder */}
+            {/* Principal's Image */}
             <div className="flex-shrink-0">
-              <div className="w-32 h-32 md:w-40 md:h-40 rounded-full bg-white/20 flex items-center justify-center border-4 border-white/30" data-testid="img-principal">
-                <User className="w-16 h-16 md:w-20 md:h-20 text-white/70" />
-              </div>
+              <img 
+                src={principalImage} 
+                alt="Principal Mr. Dilip Kumar Borah" 
+                className="w-32 h-32 md:w-48 md:h-48 rounded-lg object-cover border-4 border-white/30 shadow-xl" 
+                data-testid="img-principal"
+              />
             </div>
             
             {/* Principal's Message */}
