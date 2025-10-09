@@ -7,9 +7,10 @@ import * as schema from "@shared/schema";
 export interface IStorage {
   // User methods
   getUser(id: string): Promise<User | undefined>;
-  getUserByUsername(username: string): Promise<User | undefined>;
-  getUserByEmail(email: string): Promise<User | undefined>;
-  createUser(user: InsertUser): Promise<User>;
+  getUserByUsername(username: string | null | undefined): Promise<User | undefined>;
+  getUserByEmail(email: string | null | undefined): Promise<User | undefined>;
+  getUserByPhone(phone: string | null | undefined): Promise<User | undefined>;
+  createUser(user: Partial<InsertUser>): Promise<User>;
   updateUserApprovalStatus(id: string, status: string): Promise<User | undefined>;
   getPendingUsers(): Promise<User[]>;
   getUsersByRole(role: string): Promise<User[]>;
@@ -233,25 +234,40 @@ export class MemStorage implements IStorage {
     return this.users.get(id);
   }
 
-  async getUserByUsername(username: string): Promise<User | undefined> {
+  async getUserByUsername(username: string | null | undefined): Promise<User | undefined> {
+    if (!username) return undefined;
     return Array.from(this.users.values()).find(
       (user) => user.username === username,
     );
   }
 
-  async getUserByEmail(email: string): Promise<User | undefined> {
+  async getUserByEmail(email: string | null | undefined): Promise<User | undefined> {
+    if (!email) return undefined;
     return Array.from(this.users.values()).find(
       (user) => user.email === email,
     );
   }
 
-  async createUser(insertUser: InsertUser): Promise<User> {
+  async getUserByPhone(phone: string | null | undefined): Promise<User | undefined> {
+    if (!phone) return undefined;
+    return Array.from(this.users.values()).find(
+      (user) => user.phoneNumber === phone,
+    );
+  }
+
+  async createUser(insertUser: Partial<InsertUser>): Promise<User> {
     const id = randomUUID();
     const user: User = { 
-      ...insertUser, 
       id,
+      username: insertUser.username ?? null,
+      password: insertUser.password || "",
+      fullName: insertUser.fullName || "",
+      email: insertUser.email ?? null,
+      phoneNumber: insertUser.phoneNumber ?? null,
       role: insertUser.role || "student",
       approvalStatus: "pending",
+      facultyId: insertUser.facultyId ?? null,
+      studentId: insertUser.studentId ?? null,
       createdAt: new Date()
     };
     this.users.set(id, user);
@@ -555,13 +571,21 @@ export class PostgresStorage implements IStorage {
     return result[0];
   }
 
-  async getUserByUsername(username: string): Promise<User | undefined> {
+  async getUserByUsername(username: string | null | undefined): Promise<User | undefined> {
+    if (!username) return undefined;
     const result = await db.select().from(schema.users).where(eq(schema.users.username, username)).limit(1);
     return result[0];
   }
 
-  async getUserByEmail(email: string): Promise<User | undefined> {
+  async getUserByEmail(email: string | null | undefined): Promise<User | undefined> {
+    if (!email) return undefined;
     const result = await db.select().from(schema.users).where(eq(schema.users.email, email)).limit(1);
+    return result[0];
+  }
+
+  async getUserByPhone(phone: string | null | undefined): Promise<User | undefined> {
+    if (!phone) return undefined;
+    const result = await db.select().from(schema.users).where(eq(schema.users.phoneNumber, phone)).limit(1);
     return result[0];
   }
 

@@ -77,16 +77,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const validatedData = registerUserSchema.parse(req.body);
       
-      // Check if username or email already exists
-      const existingUser = await storage.getUserByUsername(validatedData.username);
-      const existingEmail = await storage.getUserByEmail(validatedData.email);
-      
-      if (existingUser) {
-        return res.status(400).json({ message: "Username already exists" });
+      // Validate that at least phone or email is provided
+      if (!validatedData.phoneNumber && !validatedData.email) {
+        return res.status(400).json({ message: "Phone number or email is required" });
       }
       
-      if (existingEmail) {
-        return res.status(400).json({ message: "Email already exists" });
+      // Check if phone or email already exists
+      if (validatedData.phoneNumber) {
+        const existingPhone = await storage.getUserByPhone(validatedData.phoneNumber);
+        if (existingPhone) {
+          return res.status(400).json({ message: "Phone number already exists" });
+        }
+      }
+      
+      if (validatedData.email) {
+        const existingEmail = await storage.getUserByEmail(validatedData.email);
+        if (existingEmail) {
+          return res.status(400).json({ message: "Email already exists" });
+        }
       }
       
       // Hash password
@@ -98,11 +106,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         password: hashedPassword,
       });
       
+      // Auto-approve principal role
+      if (validatedData.role === "principal") {
+        await storage.updateUserApprovalStatus(user.id, "approved");
+      }
+      
       // Remove password from response
       const { password, ...userWithoutPassword } = user;
       
+      const message = validatedData.role === "principal" 
+        ? "Registration successful."
+        : "Registration successful. Please wait for admin approval.";
+      
       res.status(201).json({ 
-        message: "Registration successful. Please wait for admin approval.",
+        message,
         user: userWithoutPassword 
       });
     } catch (error) {
@@ -117,7 +134,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const validatedData = loginUserSchema.parse(req.body);
       
-      const user = await storage.getUserByUsername(validatedData.username);
+      // Try to find user by phone, email, or username
+      let user = await storage.getUserByPhone(validatedData.identifier);
+      if (!user) {
+        user = await storage.getUserByEmail(validatedData.identifier);
+      }
+      if (!user) {
+        user = await storage.getUserByUsername(validatedData.identifier);
+      }
       
       if (!user) {
         return res.status(401).json({ message: "Invalid credentials" });

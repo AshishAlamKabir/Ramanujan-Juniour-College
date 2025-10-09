@@ -1,16 +1,19 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, timestamp, boolean, integer } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, timestamp, boolean, integer, decimal } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
 export const users = pgTable("users", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  username: text("username").notNull().unique(),
+  username: text("username").unique(),
   password: text("password").notNull(),
   fullName: text("full_name").notNull(),
-  email: text("email").notNull().unique(),
+  email: text("email").unique(),
+  phoneNumber: text("phone_number").unique(),
   role: text("role").notNull().default("student"),
   approvalStatus: text("approval_status").notNull().default("pending"),
+  facultyId: varchar("faculty_id").references(() => faculty.id),
+  studentId: varchar("student_id_ref").references(() => students.id),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -128,6 +131,52 @@ export const students = pgTable("students", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+export const teacherRatings = pgTable("teacher_ratings", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  facultyId: varchar("faculty_id").notNull().references(() => faculty.id),
+  studentId: varchar("student_id").references(() => students.id),
+  ratingValue: integer("rating_value").notNull(),
+  comment: text("comment"),
+  submittedAt: timestamp("submitted_at").defaultNow(),
+  ratingLinkId: varchar("rating_link_id"),
+});
+
+export const ratingLinks = pgTable("rating_links", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  facultyId: varchar("faculty_id").notNull().references(() => faculty.id),
+  linkToken: text("link_token").notNull().unique(),
+  createdBy: varchar("created_by").notNull().references(() => users.id),
+  isActive: boolean("is_active").default(true),
+  expiresAt: timestamp("expires_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const studentDues = pgTable("student_dues", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  studentId: varchar("student_id").notNull().references(() => students.id),
+  dueType: text("due_type").notNull(),
+  amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
+  dueDate: timestamp("due_date").notNull(),
+  status: text("status").notNull().default("pending"),
+  description: text("description"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const payments = pgTable("payments", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  dueId: varchar("due_id").notNull().references(() => studentDues.id),
+  studentId: varchar("student_id").notNull().references(() => students.id),
+  amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
+  referenceId: text("reference_id").notNull(),
+  screenshotUrl: text("screenshot_url"),
+  paymentMethod: text("payment_method").default("UPI"),
+  status: text("status").notNull().default("pending"),
+  verifiedBy: varchar("verified_by").references(() => users.id),
+  verifiedAt: timestamp("verified_at"),
+  paidAt: timestamp("paid_at").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
@@ -136,11 +185,13 @@ export const insertUserSchema = createInsertSchema(users).omit({
 });
 
 export const registerUserSchema = insertUserSchema.extend({
-  role: z.enum(["student", "teacher", "admin", "management"]),
+  role: z.enum(["student", "teacher", "admin", "management", "principal"]),
+  phoneNumber: z.string().min(10).optional(),
+  email: z.string().email().optional(),
 });
 
 export const loginUserSchema = z.object({
-  username: z.string().min(1),
+  identifier: z.string().min(1),
   password: z.string().min(1),
 });
 
@@ -184,6 +235,27 @@ export const insertStudentSchema = createInsertSchema(students).omit({
   createdAt: true,
 });
 
+export const insertTeacherRatingSchema = createInsertSchema(teacherRatings).omit({
+  id: true,
+  submittedAt: true,
+});
+
+export const insertRatingLinkSchema = createInsertSchema(ratingLinks).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertStudentDueSchema = createInsertSchema(studentDues).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertPaymentSchema = createInsertSchema(payments).omit({
+  id: true,
+  createdAt: true,
+  paidAt: true,
+});
+
 // Types
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type RegisterUser = z.infer<typeof registerUserSchema>;
@@ -207,3 +279,11 @@ export type InsertGalleryImage = z.infer<typeof insertGalleryImageSchema>;
 export type GalleryImage = typeof galleryImages.$inferSelect;
 export type InsertStudent = z.infer<typeof insertStudentSchema>;
 export type Student = typeof students.$inferSelect;
+export type InsertTeacherRating = z.infer<typeof insertTeacherRatingSchema>;
+export type TeacherRating = typeof teacherRatings.$inferSelect;
+export type InsertRatingLink = z.infer<typeof insertRatingLinkSchema>;
+export type RatingLink = typeof ratingLinks.$inferSelect;
+export type InsertStudentDue = z.infer<typeof insertStudentDueSchema>;
+export type StudentDue = typeof studentDues.$inferSelect;
+export type InsertPayment = z.infer<typeof insertPaymentSchema>;
+export type Payment = typeof payments.$inferSelect;
