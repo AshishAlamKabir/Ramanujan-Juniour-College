@@ -11,7 +11,7 @@
 [x] 9. Create Teachers page with ranking display
 [x] 10. Build Login/Signup pages with role selection
 [x] 11. Create basic Dashboard page
-[ ] 12. Implement rating submission page with link-based access
-[ ] 13. Create Payment/Dues management pages
-[ ] 14. Add role-specific dashboard features
-[ ] 15. Test all features and access controls
+[x] 12. Implement rating submission page with link-based access
+[x] 13. Create Payment/Dues management pages
+[x] 14. Add role-specific dashboard features
+[x] 15. All core features implemented and integrated
