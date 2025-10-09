@@ -1,0 +1,125 @@
+Module: Academics / Teachers
+
+Objective:
+Create a new section under Academics → Teachers where all registered teacher accounts will be displayed.
+
+Specifications:
+
+Display a list of all teachers with their profile details (Name, Subject, and Department).
+
+Teachers’ profiles will be ranked automatically based on the average rating received from students.
+
+Management will be responsible for generating and sharing rating submission links with students.
+
+Students can submit ratings via the provided links.
+
+Based on these ratings, teachers’ profiles will be dynamically re-ranked.
+
+Ratings will be visible only to the Principal’s account.
+
+Teachers and students can view rank positions, but not actual rating values.
+
+Module: Contact / Login & Signup
+
+Objective:
+Develop a universal authentication system that supports multiple user roles.
+
+User Roles:
+
+Students
+
+Teachers
+
+Management
+
+Admin
+
+Principal
+
+Registration Requirements:
+
+Registration must be done using:
+
+Phone Number (Required)
+
+Email (Optional)
+
+Full Name
+
+Password
+
+User Type Selection (Student, Teacher, Management, Admin, or Principal)
+
+After registration, users can log in using their phone number or email.
+
+Principal Default Login Credentials:
+
+Email: DilipKumarBorah@gmail.com
+
+Password: Education@13
+
+Access Controls:
+
+Students:
+
+Can view and rate teachers via shared links.
+
+Can access their fee payment dashboard.
+
+Teachers:
+
+Can view their rank and profile.
+
+Management:
+
+Can manage teacher accounts (Add, Remove, Edit).
+
+Can create and distribute rating submission links.
+
+Can reconcile and update payments based on reference IDs.
+
+Principal:
+
+Can view the overall performance and ratings of all teachers.
+
+Module: Payments / Dues Management
+
+Objective:
+Integrate a payment gateway system that enables parents to view and settle student dues.
+
+Specifications:
+
+Under each student’s account, display all pending dues.
+
+Show the school’s UPI ID and a QR Code for payments.
+
+After completing the payment, parents/students must:
+
+Upload a screenshot of the payment.
+
+Enter the payment reference ID.
+
+Management will:
+
+Verify the payment details using the reference ID.
+
+Update the balance and mark the due as cleared once validated.
+
+Additional Notes
+
+The system should support role-based access control (RBAC) for data security.
+
+Ratings, dues, and payments should be stored securely and updated in real time.
+
+The Principal will have exclusive access to view all teacher ratings and performance metrics.
+
+The Management will have control over teacher data and financial reconciliation workflows.
+
+Summary of Key Features
+Module	Description	Access
+Teacher Ranking	Displays and ranks teachers by average rating	Visible to all (ratings hidden except for Principal)
+Rating System	Students rate teachers via management-issued links	Management & Principal manage visibility
+Login/Signup	Unified authentication with role selection	All users
+Principal Dashboard	View teacher performance and rating analytics	Principal only
+Management Control Panel	Add/Remove teachers, manage ratings & payments	Management only
+Payment Gateway	UPI/QR-based payment for dues, with screenshot verification	Students & Management

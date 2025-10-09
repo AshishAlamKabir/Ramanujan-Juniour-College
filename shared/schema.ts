@@ -86,6 +86,9 @@ export const faculty = pgTable("faculty", {
   specialization: text("specialization"),
   email: text("email"),
   phone: text("phone"),
+  subject: text("subject"),
+  averageRating: decimal("average_rating", { precision: 3, scale: 2 }).default("0"),
+  rankPosition: integer("rank_position"),
   isActive: boolean("is_active").default(true),
 });
 
