@@ -17,11 +17,11 @@ export default function Students() {
   const [passedStudentsLimit, setPassedStudentsLimit] = useState(8);
 
   const { data: currentStudents = [], isLoading: currentLoading } = useQuery<Student[]>({
-    queryKey: ["/api/students", { status: "current" }],
+    queryKey: ["/api/students?status=current"],
   });
 
   const { data: passedStudents = [], isLoading: passedLoading } = useQuery<Student[]>({
-    queryKey: ["/api/students", { status: "passed" }],
+    queryKey: ["/api/students?status=passed"],
   });
 
   const filterStudents = (students: Student[]) => {

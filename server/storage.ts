@@ -682,9 +682,11 @@ export class MemStorage implements IStorage {
       ...insertStudent,
       id,
       photoUrl: insertStudent.photoUrl || null,
+      rank: insertStudent.rank || null,
       marks: insertStudent.marks || null,
       percentage: insertStudent.percentage || null,
       graduationYear: insertStudent.graduationYear || null,
+      status: insertStudent.status || "current",
       isActive: insertStudent.isActive !== undefined ? insertStudent.isActive : true,
       createdAt: new Date()
     };
@@ -1166,4 +1168,4 @@ export class PostgresStorage implements IStorage {
   }
 }
 
-export const storage = new PostgresStorage();
+export const storage = new MemStorage();

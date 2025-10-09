@@ -550,13 +550,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Student routes
   app.get("/api/students", async (req, res) => {
     try {
-      const { stream, section, year, graduationYear } = req.query;
+      const { stream, section, year, graduationYear, status } = req.query;
       const filters: any = {};
       
       if (stream && typeof stream === 'string') filters.stream = stream;
       if (section && typeof section === 'string') filters.section = section;
       if (year && typeof year === 'string') filters.year = parseInt(year);
       if (graduationYear && typeof graduationYear === 'string') filters.graduationYear = parseInt(graduationYear);
+      if (status && typeof status === 'string') filters.status = status;
       
       const students = await storage.getStudents(filters);
       res.json(students);
