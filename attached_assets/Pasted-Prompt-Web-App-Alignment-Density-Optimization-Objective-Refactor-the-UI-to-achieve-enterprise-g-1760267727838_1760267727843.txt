@@ -1,0 +1,75 @@
+Prompt: Web App Alignment & Density Optimization
+
+Objective:
+Refactor the UI to achieve enterprise-grade alignment, reduce negative space, and increase information density without degrading readability or accessibility. Drive a “tighter yet breathable” layout that surfaces more actionable content per viewport.
+
+Scope & Targets:
+
+Global layout (headers, sidebars, content grids, cards, forms, tables, modals).
+
+Spacing system (margins, padding, gutters, line height).
+
+Alignment (grid adherence, component baselines, icon/text alignment).
+
+Responsiveness across breakpoints (≥320px to ≥1440px).
+
+Above-the-fold content utilization.
+
+Key Directives:
+
+Align to Grid: Enforce a consistent 4/8px spacing scale. Snap all components to the grid; eliminate drift and misaligned baselines.
+
+Optimize Density: Reduce gratuitous whitespace by 10–20% vs. current state. Consolidate micro-gaps between adjacent components; collapse redundant vertical rhythm.
+
+Increase In-Frame Content: Prioritize critical KPIs, filters, and primary controls above the fold. Target +15–30% more meaningful elements per viewport at ≥1366×768.
+
+Right-Size Components: Normalize card and table row heights; cap header heights; minimize oversized paddings; use compact variants for inputs/buttons where appropriate.
+
+Intelligent Wrapping: Prefer multi-column layouts over tall single columns; convert long forms into logical two-column groups with clear section headers.
+
+Consistent Alignment: Align icons with text baselines; align form labels/inputs on a shared vertical axis; center empty-state visuals relative to content grid.
+
+Responsive Rules: Define breakpoint-specific density presets (compact/standard/comfortable). Ensure no overlap, truncation, or orphaned controls at any width.
+
+Accessibility Guardrails: Maintain WCAG AA: minimum 16px body text (or equivalent readable), 1.5 line-height for paragraphs, focus states visible, hit-targets ≥40×40 where interactive.
+
+Hierarchical Clarity: Increase information density without creating visual noise—use typography scale, subtle dividers, and spacing tokens to preserve scanability.
+
+No Content Loss: Consolidate and reflow; do not remove critical content or interactions.
+
+Constraints & Systemization:
+
+Use existing design tokens where available (colors, spacing, radius, shadows).
+
+Standardize to a single spacing scale and apply consistently across components.
+
+Avoid custom one-off paddings/margins; prefer tokenized utility classes.
+
+Deliverables:
+
+A revised layout specification with:
+
+Updated spacing map (per component & breakpoint)
+
+Grid definitions (columns, gutters, margins)
+
+Component size variants (compact/standard)
+
+Before/after screenshots or wireframes (desktop/tablet/mobile)
+
+A concise change log highlighting key deltas and rationale.
+
+CSS/utility diff or Tailwind class updates reflecting the new spacing/alignment.
+
+Success Metrics (acceptance criteria):
+
+≥15% more actionable items visible above the fold on desktop.
+
+Zero misaligned baselines or off-grid elements across audited screens.
+
+Perceived readability maintained or improved in stakeholder review.
+
+No accessibility regressions (automated + manual checks).
+
+Tone & Style:
+Deliver pragmatic recommendations with measurable outcomes. Favor compactness, clarity, and consistency over ornamental whitespace.
