@@ -28,41 +28,41 @@ export default function Home() {
       <NoticeBoard />
 
       {/* About Section */}
-      <section id="about" className="py-16 bg-background">
+      <section id="about" className="py-10 bg-background">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold mb-4 font-serif" data-testid="about-title">About Ramanujan Junior College</h2>
-            <p className="text-lg text-muted-foreground max-w-3xl mx-auto" data-testid="about-description">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold mb-3 font-serif" data-testid="about-title">About Ramanujan Junior College</h2>
+            <p className="text-base text-muted-foreground max-w-3xl mx-auto" data-testid="about-description">
               Founded in 2005, Ramanujan Junior College stands true to its motto - "Education, Development and Progress" 
               with a long-cherished desire to impart quality education and pave the way for splendid careers.
             </p>
           </div>
 
-          <div className="grid lg:grid-cols-2 gap-12 items-center mb-16">
+          <div className="grid lg:grid-cols-2 gap-8 items-center mb-10">
             {/* About Content */}
-            <div className="space-y-6">
+            <div className="space-y-5">
               <div>
-                <h3 className="text-2xl font-semibold mb-4">Our Legacy</h3>
-                <p className="text-muted-foreground mb-4">
+                <h3 className="text-xl font-semibold mb-3">Our Legacy</h3>
+                <p className="text-sm text-muted-foreground mb-3">
                   Primarily started as a coaching institute named Ramanujan Academy in 2003, the institution 
                   achieved immense response from society. In 2005, Ramanujan Junior College was established, 
                   offering both Science and Arts streams.
                 </p>
-                <p className="text-muted-foreground">
+                <p className="text-sm text-muted-foreground">
                   Now operating dual services - Ramanujan Junior College and Ramanujan Academy - both are co-educational 
                   institutions committed to preparing students for competitive examinations like JEE and medical entrance tests.
                 </p>
               </div>
 
-              <div className="grid sm:grid-cols-2 gap-6">
-                <Card className="p-6 border">
-                  <div className="text-2xl font-bold text-primary mb-2">2003</div>
-                  <div className="text-sm font-medium mb-1">Academy Founded</div>
+              <div className="grid sm:grid-cols-2 gap-4">
+                <Card className="p-5 border">
+                  <div className="text-2xl font-bold text-primary mb-1.5">2003</div>
+                  <div className="text-sm font-medium mb-0.5">Academy Founded</div>
                   <div className="text-xs text-muted-foreground">Ramanujan Academy</div>
                 </Card>
-                <Card className="p-6 border">
-                  <div className="text-2xl font-bold text-accent mb-2">2005</div>
-                  <div className="text-sm font-medium mb-1">College Established</div>
+                <Card className="p-5 border">
+                  <div className="text-2xl font-bold text-accent mb-1.5">2005</div>
+                  <div className="text-sm font-medium mb-0.5">College Established</div>
                   <div className="text-xs text-muted-foreground">AHSEC Recognition</div>
                 </Card>
               </div>
@@ -80,41 +80,41 @@ export default function Home() {
           </div>
 
           {/* Vision, Mission, and Values */}
-          <div className="grid lg:grid-cols-3 gap-8">
-            <Card className="p-8 border">
-              <div className="text-center mb-6">
-                <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Eye className="w-8 h-8 text-primary-foreground" />
+          <div className="grid lg:grid-cols-3 gap-6">
+            <Card className="p-6 border">
+              <div className="text-center mb-4">
+                <div className="w-14 h-14 bg-primary rounded-full flex items-center justify-center mx-auto mb-3">
+                  <Eye className="w-7 h-7 text-primary-foreground" />
                 </div>
-                <h3 className="text-xl font-semibold">Our Motto</h3>
+                <h3 className="text-lg font-semibold">Our Motto</h3>
               </div>
-              <p className="text-center text-muted-foreground">
+              <p className="text-center text-sm text-muted-foreground">
                 "Education, Development and Progress" - Our motto reflects our commitment to imparting 
                 quality education and ensuring student success in competitive fields.
               </p>
             </Card>
 
-            <Card className="p-8 border">
-              <div className="text-center mb-6">
-                <div className="w-16 h-16 bg-accent rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Target className="w-8 h-8 text-accent-foreground" />
+            <Card className="p-6 border">
+              <div className="text-center mb-4">
+                <div className="w-14 h-14 bg-accent rounded-full flex items-center justify-center mx-auto mb-3">
+                  <Target className="w-7 h-7 text-accent-foreground" />
                 </div>
-                <h3 className="text-xl font-semibold">Our Focus</h3>
+                <h3 className="text-lg font-semibold">Our Focus</h3>
               </div>
-              <p className="text-center text-muted-foreground">
+              <p className="text-center text-sm text-muted-foreground">
                 Intensive coaching by permanent qualified faculty to prepare students for JEE, Medical entrance, 
                 improve employability, and nurture social responsibility.
               </p>
             </Card>
 
-            <Card className="p-8 border">
-              <div className="text-center mb-6">
-                <div className="w-16 h-16 bg-secondary rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Heart className="w-8 h-8 text-secondary-foreground" />
+            <Card className="p-6 border">
+              <div className="text-center mb-4">
+                <div className="w-14 h-14 bg-secondary rounded-full flex items-center justify-center mx-auto mb-3">
+                  <Heart className="w-7 h-7 text-secondary-foreground" />
                 </div>
-                <h3 className="text-xl font-semibold">Values</h3>
+                <h3 className="text-lg font-semibold">Values</h3>
               </div>
-              <p className="text-center text-muted-foreground">
+              <p className="text-center text-sm text-muted-foreground">
                 Nistha (dedication), Dhriti (courage), and Satyam (truth) - These core values guide our approach 
                 to education and character development.
               </p>
@@ -124,25 +124,25 @@ export default function Home() {
       </section>
 
       {/* Academic Programs Preview */}
-      <section className="py-16 bg-muted">
+      <section className="py-10 bg-muted">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold mb-4 font-serif">Academic Excellence</h2>
-            <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold mb-3 font-serif">Academic Excellence</h2>
+            <p className="text-base text-muted-foreground max-w-3xl mx-auto">
               Explore our comprehensive range of undergraduate programs across arts, commerce, management, 
               science, and vocational streams under the Choice Based Credit System.
             </p>
           </div>
 
           {/* Program Categories */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-            <Card className="p-6 border hover:shadow-lg transition-shadow">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+            <Card className="p-5 border hover:shadow-lg transition-shadow">
               <div className="text-center">
-                <div className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center mx-auto mb-4">
-                  <GraduationCap className="w-6 h-6 text-primary-foreground" />
+                <div className="w-11 h-11 bg-primary rounded-lg flex items-center justify-center mx-auto mb-3">
+                  <GraduationCap className="w-5 h-5 text-primary-foreground" />
                 </div>
-                <h3 className="font-semibold mb-2">Arts & Humanities</h3>
-                <p className="text-sm text-muted-foreground mb-4">English, Hindi, Political Science, Philosophy, Applied Psychology</p>
+                <h3 className="font-semibold mb-1.5 text-sm">Arts & Humanities</h3>
+                <p className="text-xs text-muted-foreground mb-3 leading-relaxed">English, Hindi, Political Science, Philosophy, Applied Psychology</p>
                 <Link href="/academics">
                   <Button variant="link" className="text-primary p-0 h-auto font-medium hover:underline">
                     Explore Programs →
@@ -151,13 +151,13 @@ export default function Home() {
               </div>
             </Card>
 
-            <Card className="p-6 border hover:shadow-lg transition-shadow">
+            <Card className="p-5 border hover:shadow-lg transition-shadow">
               <div className="text-center">
-                <div className="w-12 h-12 bg-accent rounded-lg flex items-center justify-center mx-auto mb-4">
-                  <TrendingUp className="w-6 h-6 text-accent-foreground" />
+                <div className="w-11 h-11 bg-accent rounded-lg flex items-center justify-center mx-auto mb-3">
+                  <TrendingUp className="w-5 h-5 text-accent-foreground" />
                 </div>
-                <h3 className="font-semibold mb-2">Commerce</h3>
-                <p className="text-sm text-muted-foreground mb-4">B.Com (Hons.), B.Com (Prog.), Business Management Studies</p>
+                <h3 className="font-semibold mb-1.5 text-sm">Commerce</h3>
+                <p className="text-xs text-muted-foreground mb-3 leading-relaxed">B.Com (Hons.), B.Com (Prog.), Business Management Studies</p>
                 <Link href="/academics">
                   <Button variant="link" className="text-primary p-0 h-auto font-medium hover:underline">
                     Explore Programs →
@@ -166,13 +166,13 @@ export default function Home() {
               </div>
             </Card>
 
-            <Card className="p-6 border hover:shadow-lg transition-shadow">
+            <Card className="p-5 border hover:shadow-lg transition-shadow">
               <div className="text-center">
-                <div className="w-12 h-12 bg-secondary rounded-lg flex items-center justify-center mx-auto mb-4">
-                  <Atom className="w-6 h-6 text-secondary-foreground" />
+                <div className="w-11 h-11 bg-secondary rounded-lg flex items-center justify-center mx-auto mb-3">
+                  <Atom className="w-5 h-5 text-secondary-foreground" />
                 </div>
-                <h3 className="font-semibold mb-2">Science</h3>
-                <p className="text-sm text-muted-foreground mb-4">Mathematics, Statistics, Computer Science, Environmental Science</p>
+                <h3 className="font-semibold mb-1.5 text-sm">Science</h3>
+                <p className="text-xs text-muted-foreground mb-3 leading-relaxed">Mathematics, Statistics, Computer Science, Environmental Science</p>
                 <Link href="/academics">
                   <Button variant="link" className="text-primary p-0 h-auto font-medium hover:underline">
                     Explore Programs →
@@ -181,13 +181,13 @@ export default function Home() {
               </div>
             </Card>
 
-            <Card className="p-6 border hover:shadow-lg transition-shadow">
+            <Card className="p-5 border hover:shadow-lg transition-shadow">
               <div className="text-center">
-                <div className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center mx-auto mb-4">
-                  <Wrench className="w-6 h-6 text-primary-foreground" />
+                <div className="w-11 h-11 bg-primary rounded-lg flex items-center justify-center mx-auto mb-3">
+                  <Wrench className="w-5 h-5 text-primary-foreground" />
                 </div>
-                <h3 className="font-semibold mb-2">Vocational</h3>
-                <p className="text-sm text-muted-foreground mb-4">B.Voc courses focused on skill development and industry readiness</p>
+                <h3 className="font-semibold mb-1.5 text-sm">Vocational</h3>
+                <p className="text-xs text-muted-foreground mb-3 leading-relaxed">B.Voc courses focused on skill development and industry readiness</p>
                 <Link href="/academics">
                   <Button variant="link" className="text-primary p-0 h-auto font-medium hover:underline">
                     Explore Programs →
@@ -198,56 +198,56 @@ export default function Home() {
           </div>
 
           {/* Academic Resources */}
-          <div className="grid md:grid-cols-2 gap-8">
-            <Card className="bg-primary text-primary-foreground p-8">
-              <h3 className="text-xl font-semibold mb-4">Academic Resources</h3>
-              <ul className="space-y-3">
-                <li className="flex items-center">
-                  <CheckCircle className="w-5 h-5 mr-3" />
+          <div className="grid md:grid-cols-2 gap-6">
+            <Card className="bg-primary text-primary-foreground p-6">
+              <h3 className="text-lg font-semibold mb-3">Academic Resources</h3>
+              <ul className="space-y-2.5">
+                <li className="flex items-center text-sm">
+                  <CheckCircle className="w-4 h-4 mr-2.5" />
                   Choice Based Credit System (CBCS)
                 </li>
-                <li className="flex items-center">
-                  <CheckCircle className="w-5 h-5 mr-3" />
+                <li className="flex items-center text-sm">
+                  <CheckCircle className="w-4 h-4 mr-2.5" />
                   University of Delhi Syllabus
                 </li>
-                <li className="flex items-center">
-                  <CheckCircle className="w-5 h-5 mr-3" />
+                <li className="flex items-center text-sm">
+                  <CheckCircle className="w-4 h-4 mr-2.5" />
                   Program & Course Outcomes
                 </li>
-                <li className="flex items-center">
-                  <CheckCircle className="w-5 h-5 mr-3" />
+                <li className="flex items-center text-sm">
+                  <CheckCircle className="w-4 h-4 mr-2.5" />
                   Regular Academic Calendar
                 </li>
               </ul>
               <Link href="/academics#calendar">
-                <Button className="mt-6 bg-primary-foreground text-primary hover:bg-primary-foreground/90">
+                <Button className="mt-4 bg-primary-foreground text-primary hover:bg-primary-foreground/90 text-sm py-2">
                   View Academic Calendar
                 </Button>
               </Link>
             </Card>
 
-            <Card className="bg-accent text-accent-foreground p-8">
-              <h3 className="text-xl font-semibold mb-4">Student Support</h3>
-              <ul className="space-y-3">
-                <li className="flex items-center">
-                  <CheckCircle className="w-5 h-5 mr-3" />
+            <Card className="bg-accent text-accent-foreground p-6">
+              <h3 className="text-lg font-semibold mb-3">Student Support</h3>
+              <ul className="space-y-2.5">
+                <li className="flex items-center text-sm">
+                  <CheckCircle className="w-4 h-4 mr-2.5" />
                   Time Tables & Schedules
                 </li>
-                <li className="flex items-center">
-                  <CheckCircle className="w-5 h-5 mr-3" />
+                <li className="flex items-center text-sm">
+                  <CheckCircle className="w-4 h-4 mr-2.5" />
                   Academic Counseling
                 </li>
-                <li className="flex items-center">
-                  <CheckCircle className="w-5 h-5 mr-3" />
+                <li className="flex items-center text-sm">
+                  <CheckCircle className="w-4 h-4 mr-2.5" />
                   Career Guidance
                 </li>
-                <li className="flex items-center">
-                  <CheckCircle className="w-5 h-5 mr-3" />
+                <li className="flex items-center text-sm">
+                  <CheckCircle className="w-4 h-4 mr-2.5" />
                   Research Opportunities
                 </li>
               </ul>
               <Link href="/students">
-                <Button className="mt-6 bg-accent-foreground text-accent hover:bg-accent-foreground/90">
+                <Button className="mt-4 bg-accent-foreground text-accent hover:bg-accent-foreground/90 text-sm py-2">
                   Student Resources
                 </Button>
               </Link>

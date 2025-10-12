@@ -48,18 +48,18 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-50 bg-card/95 backdrop-blur-sm border-b border-border">
       <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-14">
           {/* Logo and College Name */}
           <Link href="/" data-testid="logo-link">
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center gap-2.5">
               <img 
                 src={collegeLogo} 
                 alt="Ramanujan Junior College Logo" 
-                className="w-12 h-12 object-contain"
+                className="w-10 h-10 object-contain"
               />
-              <div>
-                <h1 className="text-lg font-bold text-foreground">Ramanujan Junior College</h1>
-                <p className="text-xs text-muted-foreground">Assam (AHSEC)</p>
+              <div className="leading-tight">
+                <h1 className="text-base font-bold text-foreground">Ramanujan Junior College</h1>
+                <p className="text-xs text-muted-foreground -mt-0.5">Assam (AHSEC)</p>
               </div>
             </div>
           </Link>
@@ -127,7 +127,7 @@ export default function Header() {
               </Button>
             </SheetTrigger>
             <SheetContent side="right" className="w-[300px] sm:w-[400px]">
-              <nav className="flex flex-col space-y-4 mt-8" data-testid="mobile-nav">
+              <nav className="flex flex-col space-y-3 mt-6" data-testid="mobile-nav">
                 {navigation.map((item) => (
                   <div key={item.name}>
                     <Link
