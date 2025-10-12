@@ -61,13 +61,13 @@ export default function EventsCarousel() {
   };
 
   return (
-    <section className="py-16 bg-background" data-testid="section-events-carousel">
-      <div className="container mx-auto px-6 md:px-8">
-        <div className="mb-12 text-center">
-          <h2 className="text-4xl md:text-5xl font-bold font-serif text-primary mb-2" data-testid="heading-events-carousel">
+    <section className="py-10 bg-background" data-testid="section-events-carousel">
+      <div className="container mx-auto px-4 md:px-6">
+        <div className="mb-8 text-center">
+          <h2 className="text-3xl md:text-4xl font-bold font-serif text-primary mb-2" data-testid="heading-events-carousel">
             College Achievements & Events
           </h2>
-          <div className="w-24 h-1 bg-primary mx-auto mt-4"></div>
+          <div className="w-20 h-1 bg-primary mx-auto mt-3"></div>
         </div>
         
         <div className="max-w-6xl mx-auto">
@@ -82,8 +82,8 @@ export default function EventsCarousel() {
               />
 
               {collegeImages[currentIndex].caption && (
-                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent text-white p-6">
-                  <p className="text-center text-lg font-medium" data-testid="text-event-caption">
+                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent text-white p-4">
+                  <p className="text-center text-sm font-medium" data-testid="text-event-caption">
                     {collegeImages[currentIndex].caption}
                   </p>
                 </div>
@@ -110,7 +110,7 @@ export default function EventsCarousel() {
               </Button>
             </div>
 
-            <div className="flex justify-center gap-2 p-4 flex-wrap">
+            <div className="flex justify-center gap-2 p-3 flex-wrap">
               {collegeImages.map((_, index) => (
                 <button
                   key={index}
