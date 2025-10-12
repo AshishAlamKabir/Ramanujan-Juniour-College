@@ -34,10 +34,10 @@ export default function GalleryCarousel() {
 
   if (isLoading) {
     return (
-      <section className="py-16 bg-muted">
+      <section className="py-10 bg-muted">
         <div className="container mx-auto px-4">
           <div className="max-w-5xl mx-auto">
-            <div className="w-full h-96 bg-muted animate-pulse rounded-lg"></div>
+            <div className="w-full h-80 bg-muted animate-pulse rounded-lg"></div>
           </div>
         </div>
       </section>
@@ -49,10 +49,10 @@ export default function GalleryCarousel() {
   }
 
   return (
-    <section className="py-16 bg-muted" data-testid="section-gallery">
+    <section className="py-10 bg-muted" data-testid="section-gallery">
       <div className="container mx-auto px-4">
         <div className="max-w-5xl mx-auto">
-          <h2 className="text-4xl font-bold mb-8 text-center font-serif" data-testid="heading-gallery">
+          <h2 className="text-3xl font-bold mb-6 text-center font-serif" data-testid="heading-gallery">
             Gallery
           </h2>
 
@@ -72,8 +72,8 @@ export default function GalleryCarousel() {
               )}
 
               {images[currentIndex].caption && (
-                <div className="absolute bottom-0 left-0 right-0 bg-black/50 text-white p-4">
-                  <p className="text-center text-lg" data-testid="text-gallery-caption">
+                <div className="absolute bottom-0 left-0 right-0 bg-black/50 text-white p-3">
+                  <p className="text-center text-sm" data-testid="text-gallery-caption">
                     {images[currentIndex].caption}
                   </p>
                 </div>
@@ -105,7 +105,7 @@ export default function GalleryCarousel() {
             </div>
 
             {images.length > 1 && (
-              <div className="flex justify-center gap-2 p-4">
+              <div className="flex justify-center gap-2 p-3">
                 {images.map((_, index) => (
                   <button
                     key={index}

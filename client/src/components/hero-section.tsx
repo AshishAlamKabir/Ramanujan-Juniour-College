@@ -40,37 +40,37 @@ Request to parents/guardians : :
       {/* Campus background image with overlay */}
       <div className="absolute inset-0 bg-black/20"></div>
       
-      <div className="relative container mx-auto px-4 py-16">
+      <div className="relative container mx-auto px-4 py-12">
         {/* Section 1: College Branding */}
-        <div className="max-w-4xl mx-auto text-center mb-16">
-          <h1 className="text-5xl md:text-6xl font-bold mb-4 font-serif" data-testid="college-name">
+        <div className="max-w-4xl mx-auto text-center mb-10">
+          <h1 className="text-4xl md:text-5xl font-bold mb-3 font-serif" data-testid="college-name">
             Ramanujan Junior College
           </h1>
-          <p className="text-xl md:text-2xl opacity-90" data-testid="vision-statement">
+          <p className="text-lg md:text-xl opacity-90" data-testid="vision-statement">
             Education, Development and Progress
           </p>
         </div>
 
         {/* Section 2: From Principal's Desk */}
-        <div className="max-w-4xl mx-auto bg-white/10 backdrop-blur-sm rounded-lg p-8 md:p-12">
-          <h2 className="text-3xl md:text-4xl font-bold mb-8 text-center font-serif" data-testid="heading-principal-desk">
+        <div className="max-w-4xl mx-auto bg-white/10 backdrop-blur-sm rounded-lg p-6 md:p-8">
+          <h2 className="text-2xl md:text-3xl font-bold mb-6 text-center font-serif" data-testid="heading-principal-desk">
             From Principal's Desk
           </h2>
           
-          <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
+          <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
             {/* Principal's Image */}
             <div className="flex-shrink-0">
               <img 
                 src={principalImage} 
                 alt="Principal Mr. Dilip Kumar Borah" 
-                className="w-32 h-32 md:w-48 md:h-48 rounded-lg object-cover border-4 border-white/30 shadow-xl" 
+                className="w-28 h-28 md:w-40 md:h-40 rounded-lg object-cover border-4 border-white/30 shadow-xl" 
                 data-testid="img-principal"
               />
             </div>
             
             {/* Principal's Message */}
             <div className="flex-1 text-center">
-              <p className="text-base md:text-lg leading-relaxed mb-4 opacity-95 whitespace-pre-line text-justify" data-testid="text-principal-message">
+              <p className="text-sm md:text-base leading-relaxed mb-3 opacity-95 whitespace-pre-line text-justify" data-testid="text-principal-message">
                 {showFullMessage ? fullMessage : previewMessage}
               </p>
               
@@ -78,7 +78,7 @@ Request to parents/guardians : :
                 <Button 
                   onClick={() => setShowFullMessage(true)}
                   variant="outline"
-                  className="mb-6 border-white text-white hover:bg-white hover:text-primary transition-colors"
+                  className="mb-4 border-white text-white hover:bg-white hover:text-primary transition-colors text-sm py-2"
                   data-testid="button-show-more"
                 >
                   Show More
@@ -89,17 +89,17 @@ Request to parents/guardians : :
                 <Button 
                   onClick={() => setShowFullMessage(false)}
                   variant="outline"
-                  className="mb-6 border-white text-white hover:bg-white hover:text-primary transition-colors"
+                  className="mb-4 border-white text-white hover:bg-white hover:text-primary transition-colors text-sm py-2"
                   data-testid="button-show-less"
                 >
                   Show Less
                 </Button>
               )}
               
-              <div className="font-semibold" data-testid="text-principal-signature">
-                <p className="text-lg">Principal</p>
-                <p className="text-xl">(Mr. Dilip Kumar Borah)</p>
-                <p className="text-base opacity-90">Ramanujan Junior College</p>
+              <div className="font-semibold text-sm" data-testid="text-principal-signature">
+                <p>Principal</p>
+                <p className="text-base">(Mr. Dilip Kumar Borah)</p>
+                <p className="opacity-90">Ramanujan Junior College</p>
               </div>
             </div>
           </div>

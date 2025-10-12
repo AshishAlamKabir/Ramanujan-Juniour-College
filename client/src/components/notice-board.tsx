@@ -22,9 +22,9 @@ export default function NoticeBoard() {
 
   if (noticesLoading || eventsLoading) {
     return (
-      <section className="py-12 bg-muted">
+      <section className="py-8 bg-muted">
         <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-3 gap-6">
             {[...Array(3)].map((_, i) => (
               <Card key={i} className="shadow-lg">
                 <CardHeader>
@@ -46,9 +46,9 @@ export default function NoticeBoard() {
   }
 
   return (
-    <section className="py-12 bg-muted">
+    <section className="py-8 bg-muted">
       <div className="container mx-auto px-4">
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="grid md:grid-cols-3 gap-6">
           {/* Notice Board */}
           <Card className="shadow-lg overflow-hidden">
             <CardHeader className="bg-primary text-primary-foreground">
@@ -58,13 +58,13 @@ export default function NoticeBoard() {
               </CardTitle>
             </CardHeader>
             <CardContent className="p-0">
-              <div className="max-h-80 overflow-y-auto" data-testid="notices-list">
+              <div className="max-h-72 overflow-y-auto" data-testid="notices-list">
                 {!notices || notices.length === 0 ? (
-                  <div className="p-6 text-center text-muted-foreground">
+                  <div className="p-5 text-center text-muted-foreground text-sm">
                     No notices available at this time.
                   </div>
                 ) : (
-                  <div className="p-6 space-y-4">
+                  <div className="p-5 space-y-3">
                     {notices.slice(0, 5).map((notice, index) => (
                       <div key={notice.id} className={`border-l-4 pl-4 py-2 ${
                         notice.priority === 'high' ? 'border-destructive' :
@@ -84,8 +84,8 @@ export default function NoticeBoard() {
                   </div>
                 )}
               </div>
-              <div className="px-6 py-4 bg-muted">
-                <Link href="/students#notices" className="text-primary font-semibold text-sm hover:underline" data-testid="view-all-notices">
+              <div className="px-5 py-3 bg-muted">
+                <Link href="/students#notices" className="text-primary font-semibold text-xs hover:underline" data-testid="view-all-notices">
                   View All Notices →
                 </Link>
               </div>
@@ -101,13 +101,13 @@ export default function NoticeBoard() {
               </CardTitle>
             </CardHeader>
             <CardContent className="p-0">
-              <div className="max-h-80 overflow-y-auto" data-testid="events-list">
+              <div className="max-h-72 overflow-y-auto" data-testid="events-list">
                 {!events || events.length === 0 ? (
-                  <div className="p-6 text-center text-muted-foreground">
+                  <div className="p-5 text-center text-muted-foreground text-sm">
                     No upcoming events at this time.
                   </div>
                 ) : (
-                  <div className="p-6 space-y-4">
+                  <div className="p-5 space-y-3">
                     {events.slice(0, 3).map((event, index) => (
                       <div key={event.id} className="flex items-start space-x-3" data-testid={`event-${index}`}>
                         <div className="bg-primary text-primary-foreground rounded p-2 text-xs font-bold text-center min-w-[50px]">
@@ -124,8 +124,8 @@ export default function NoticeBoard() {
                   </div>
                 )}
               </div>
-              <div className="px-6 py-4 bg-muted">
-                <Link href="/news#events" className="text-primary font-semibold text-sm hover:underline" data-testid="view-all-events">
+              <div className="px-5 py-3 bg-muted">
+                <Link href="/news#events" className="text-primary font-semibold text-xs hover:underline" data-testid="view-all-events">
                   View All Events →
                 </Link>
               </div>
@@ -140,58 +140,58 @@ export default function NoticeBoard() {
                 Quick Links
               </CardTitle>
             </CardHeader>
-            <CardContent className="p-6 space-y-3">
+            <CardContent className="p-5 space-y-2">
               <Link 
                 href="/students#timetables" 
-                className="flex items-center justify-between p-3 rounded hover:bg-muted transition-colors"
+                className="flex items-center justify-between p-2.5 rounded hover:bg-muted transition-colors"
                 data-testid="quick-link-timetables"
               >
-                <span className="flex items-center">
-                  <Calendar className="w-4 h-4 mr-3 text-primary" />
+                <span className="flex items-center text-sm">
+                  <Calendar className="w-4 h-4 mr-2.5 text-primary" />
                   Time Tables
                 </span>
                 <ArrowRight className="w-4 h-4 text-muted-foreground" />
               </Link>
               <Link 
                 href="/academics#calendar" 
-                className="flex items-center justify-between p-3 rounded hover:bg-muted transition-colors"
+                className="flex items-center justify-between p-2.5 rounded hover:bg-muted transition-colors"
                 data-testid="quick-link-calendar"
               >
-                <span className="flex items-center">
-                  <Calendar className="w-4 h-4 mr-3 text-primary" />
+                <span className="flex items-center text-sm">
+                  <Calendar className="w-4 h-4 mr-2.5 text-primary" />
                   Academic Calendar
                 </span>
                 <ArrowRight className="w-4 h-4 text-muted-foreground" />
               </Link>
               <Link 
                 href="/admissions" 
-                className="flex items-center justify-between p-3 rounded hover:bg-muted transition-colors"
+                className="flex items-center justify-between p-2.5 rounded hover:bg-muted transition-colors"
                 data-testid="quick-link-admissions"
               >
-                <span className="flex items-center">
-                  <Calendar className="w-4 h-4 mr-3 text-primary" />
+                <span className="flex items-center text-sm">
+                  <Calendar className="w-4 h-4 mr-2.5 text-primary" />
                   Admissions
                 </span>
                 <ArrowRight className="w-4 h-4 text-muted-foreground" />
               </Link>
               <Link 
                 href="/students#forms" 
-                className="flex items-center justify-between p-3 rounded hover:bg-muted transition-colors"
+                className="flex items-center justify-between p-2.5 rounded hover:bg-muted transition-colors"
                 data-testid="quick-link-forms"
               >
-                <span className="flex items-center">
-                  <LinkIcon className="w-4 h-4 mr-3 text-primary" />
+                <span className="flex items-center text-sm">
+                  <LinkIcon className="w-4 h-4 mr-2.5 text-primary" />
                   Forms & Documents
                 </span>
                 <ArrowRight className="w-4 h-4 text-muted-foreground" />
               </Link>
               <Link 
                 href="/students#placement" 
-                className="flex items-center justify-between p-3 rounded hover:bg-muted transition-colors"
+                className="flex items-center justify-between p-2.5 rounded hover:bg-muted transition-colors"
                 data-testid="quick-link-placement"
               >
-                <span className="flex items-center">
-                  <LinkIcon className="w-4 h-4 mr-3 text-primary" />
+                <span className="flex items-center text-sm">
+                  <LinkIcon className="w-4 h-4 mr-2.5 text-primary" />
                   Placement Cell
                 </span>
                 <ArrowRight className="w-4 h-4 text-muted-foreground" />

@@ -65,26 +65,26 @@ export default function Login() {
         <meta name="description" content="Login to your Ramanujan Junior College account" />
       </Helmet>
 
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 py-8 px-4 sm:px-6 lg:px-8">
         <Card className="w-full max-w-md">
-          <CardHeader className="space-y-1">
-            <div className="flex items-center justify-center mb-4">
+          <CardHeader className="space-y-1 pb-4">
+            <div className="flex items-center justify-center mb-3">
               <img 
                 src={collegeLogo} 
                 alt="Ramanujan Junior College" 
-                className="w-20 h-20 object-contain"
+                className="w-16 h-16 object-contain"
               />
             </div>
-            <CardTitle className="text-2xl text-center" data-testid="login-title">
+            <CardTitle className="text-xl text-center" data-testid="login-title">
               Welcome Back
             </CardTitle>
-            <CardDescription className="text-center" data-testid="login-subtitle">
+            <CardDescription className="text-center text-sm" data-testid="login-subtitle">
               Login to access your account
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-0">
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
                 <FormField
                   control={form.control}
                   name="identifier"
