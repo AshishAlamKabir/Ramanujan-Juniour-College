@@ -3,6 +3,7 @@ import { randomUUID } from "crypto";
 import { db } from "./db";
 import { eq, and } from "drizzle-orm";
 import * as schema from "@shared/schema";
+import bcrypt from "bcryptjs";
 
 export interface IStorage {
   // User methods
@@ -353,6 +354,60 @@ export class MemStorage implements IStorage {
       };
       this.students.set(id, student);
     }
+
+    // Initialize demo user accounts
+    const demoPassword = bcrypt.hashSync("demo123", 10);
+    
+    // Demo Student
+    const demoStudentId = randomUUID();
+    const demoStudent: User = {
+      id: demoStudentId,
+      username: null,
+      password: demoPassword,
+      fullName: "Demo Student",
+      email: "demo.student@rjc.edu",
+      phoneNumber: "1111111111",
+      role: "student",
+      approvalStatus: "approved",
+      facultyId: null,
+      studentId: "RJC20251000",
+      createdAt: new Date()
+    };
+    this.users.set(demoStudentId, demoStudent);
+
+    // Demo Teacher
+    const demoTeacherId = randomUUID();
+    const demoTeacher: User = {
+      id: demoTeacherId,
+      username: null,
+      password: demoPassword,
+      fullName: "Demo Teacher",
+      email: "demo.teacher@rjc.edu",
+      phoneNumber: "2222222222",
+      role: "teacher",
+      approvalStatus: "approved",
+      facultyId: null,
+      studentId: null,
+      createdAt: new Date()
+    };
+    this.users.set(demoTeacherId, demoTeacher);
+
+    // Demo Management
+    const demoManagementId = randomUUID();
+    const demoManagement: User = {
+      id: demoManagementId,
+      username: null,
+      password: demoPassword,
+      fullName: "Demo Management",
+      email: "demo.management@rjc.edu",
+      phoneNumber: "3333333333",
+      role: "management",
+      approvalStatus: "approved",
+      facultyId: null,
+      studentId: null,
+      createdAt: new Date()
+    };
+    this.users.set(demoManagementId, demoManagement);
   }
 
   // User methods

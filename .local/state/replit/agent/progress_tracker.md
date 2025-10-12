@@ -51,3 +51,5 @@
   - Management: Phone 3333333333
 [x] All accounts use password: demo123
 [x] Created DEMO_ACCOUNTS.md documentation with login credentials
+[x] Fixed demo accounts persistence issue - moved from script to storage initialization
+[x] Demo accounts now persist across server restarts (hardcoded in MemStorage)
