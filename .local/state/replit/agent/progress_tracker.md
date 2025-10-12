@@ -42,3 +42,12 @@
 [x] Generate student ID based on year/section/roll for present students
 [x] Backend validates passed-out student IDs exist and aren't already used
 [x] Updated registration forms with conditional fields
+
+## Demo Accounts Setup ✓
+[x] Created demo account creation script (scripts/create-demo-accounts.ts)
+[x] Generated demo accounts for all user types:
+  - Student: Phone 1111111111, Student ID RJC20251000
+  - Teacher: Phone 2222222222
+  - Management: Phone 3333333333
+[x] All accounts use password: demo123
+[x] Created DEMO_ACCOUNTS.md documentation with login credentials
