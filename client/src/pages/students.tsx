@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import type { Student } from "@shared/schema";
+import type { Student, User } from "@shared/schema";
 
 export default function Students() {
   const [yearFilter, setYearFilter] = useState<string>("all");
@@ -22,6 +22,10 @@ export default function Students() {
 
   const { data: passedStudents = [], isLoading: passedLoading } = useQuery<Student[]>({
     queryKey: ["/api/students?status=passed"],
+  });
+
+  const { data: approvedStudentUsers = [], isLoading: approvedLoading } = useQuery<User[]>({
+    queryKey: ["/api/students/approved"],
   });
 
   const filterStudents = (students: Student[]) => {
@@ -61,6 +65,32 @@ export default function Students() {
         </h3>
         <p className="text-sm text-gray-600 dark:text-gray-400" data-testid={`student-id-${student.id}`}>
           Student ID: {student.studentId}
+        </p>
+      </CardContent>
+    </Card>
+  );
+
+  const ApprovedStudentCard = ({ user }: { user: User }) => (
+    <Card className="overflow-hidden border-2 hover:shadow-lg transition-shadow bg-gradient-to-br from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20" data-testid={`approved-student-${user.id}`}>
+      <CardContent className="p-4 text-center">
+        <div className="mb-3">
+          <div className="w-24 h-24 rounded-full mx-auto bg-gradient-to-br from-green-400 to-blue-500 flex items-center justify-center text-white text-3xl font-bold border-4 border-white dark:border-gray-700 shadow-lg">
+            {user.fullName.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
+          </div>
+        </div>
+        <div className="mb-2">
+          <span className="inline-block bg-green-500 text-white px-3 py-1 rounded-full text-sm font-semibold" data-testid={`approved-badge-${user.id}`}>
+            Approved Student
+          </span>
+        </div>
+        <h3 className="font-semibold text-gray-900 dark:text-white mb-1" data-testid={`approved-name-${user.id}`}>
+          {user.fullName}
+        </h3>
+        <p className="text-sm text-gray-600 dark:text-gray-400" data-testid={`approved-studentid-${user.id}`}>
+          Student ID: {user.studentId}
+        </p>
+        <p className="text-xs text-gray-500 dark:text-gray-500 mt-1" data-testid={`approved-phone-${user.id}`}>
+          Phone: {user.phoneNumber}
         </p>
       </CardContent>
     </Card>
@@ -196,6 +226,34 @@ export default function Students() {
       </div>
 
       <div className="container mx-auto px-4 py-12">
+        {approvedStudentUsers.length > 0 && (
+          <div className="mb-12" data-testid="approved-students">
+            <div className="bg-gradient-to-r from-green-500 to-blue-600 dark:from-green-700 dark:to-blue-800 rounded-t-lg p-4">
+              <h2 className="text-2xl font-bold text-white text-center" data-testid="approved-students-title">
+                APPROVED REGISTERED STUDENTS
+              </h2>
+            </div>
+            
+            <div className="bg-white dark:bg-gray-800 rounded-b-lg shadow-lg p-6">
+              {approvedLoading ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                  {[...Array(4)].map((_, i) => (
+                    <div key={i} className="animate-pulse">
+                      <div className="bg-gray-200 dark:bg-gray-700 h-48 rounded-lg"></div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                  {approvedStudentUsers.map((user) => (
+                    <ApprovedStudentCard key={user.id} user={user} />
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
         <StudentsSection
           title="CURRENT STUDENTS"
           students={filteredCurrentStudents}

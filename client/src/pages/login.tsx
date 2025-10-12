@@ -1,7 +1,5 @@
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { Helmet } from "react-helmet-async";
@@ -9,17 +7,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { Link } from "wouter";
 import { LogIn } from "lucide-react";
+import { loginUserSchema } from "@shared/schema";
+import type { LoginUser } from "@shared/schema";
 
-const loginSchema = z.object({
-  identifier: z.string().min(1, "Phone number, email, or username is required"),
-  password: z.string().min(1, "Password is required"),
-});
-
-type LoginForm = z.infer<typeof loginSchema>;
+type LoginForm = LoginUser;
 
 export default function Login() {
   const [, navigate] = useLocation();
@@ -27,9 +23,10 @@ export default function Login() {
   const queryClient = useQueryClient();
   
   const form = useForm<LoginForm>({
-    resolver: zodResolver(loginSchema),
+    resolver: zodResolver(loginUserSchema),
     defaultValues: {
       identifier: "",
+      role: "student",
       password: "",
     },
   });
@@ -88,14 +85,37 @@ export default function Login() {
                   name="identifier"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Phone Number, Email, or Username</FormLabel>
+                      <FormLabel>Phone Number or Student ID</FormLabel>
                       <FormControl>
                         <Input 
                           {...field} 
-                          placeholder="Enter your phone, email, or username"
+                          placeholder="Enter phone number or student ID"
                           data-testid="input-identifier"
                         />
                       </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="role"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>User Type</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger data-testid="select-role">
+                            <SelectValue placeholder="Select your user type" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="student" data-testid="option-student">Student</SelectItem>
+                          <SelectItem value="teacher" data-testid="option-teacher">Teacher</SelectItem>
+                          <SelectItem value="management" data-testid="option-management">Management</SelectItem>
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -135,10 +155,8 @@ export default function Login() {
               <span className="text-gray-600 dark:text-gray-400">
                 Don't have an account?{" "}
               </span>
-              <Link href="/signup">
-                <a className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium" data-testid="link-signup">
-                  Sign up here
-                </a>
+              <Link href="/signup" className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium" data-testid="link-signup">
+                Sign up here
               </Link>
             </div>
           </CardContent>

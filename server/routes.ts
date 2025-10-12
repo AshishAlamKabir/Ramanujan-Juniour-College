@@ -77,46 +77,85 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const validatedData = registerUserSchema.parse(req.body);
       
-      // Validate that at least phone or email is provided
-      if (!validatedData.phoneNumber && !validatedData.email) {
-        return res.status(400).json({ message: "Phone number or email is required" });
+      // Validate that phone number is required
+      if (!validatedData.phoneNumber) {
+        return res.status(400).json({ message: "Phone number is required" });
       }
       
-      // Check if phone or email already exists
-      if (validatedData.phoneNumber) {
-        const existingPhone = await storage.getUserByPhone(validatedData.phoneNumber);
-        if (existingPhone) {
-          return res.status(400).json({ message: "Phone number already exists" });
-        }
+      // Check if phone already exists
+      const existingPhone = await storage.getUserByPhone(validatedData.phoneNumber);
+      if (existingPhone) {
+        return res.status(400).json({ message: "Phone number already exists" });
       }
       
+      // Check if email already exists (if provided)
       if (validatedData.email) {
         const existingEmail = await storage.getUserByEmail(validatedData.email);
         if (existingEmail) {
           return res.status(400).json({ message: "Email already exists" });
         }
       }
+
+      let studentIdToUse: string | null = null;
+      
+      // Handle student-specific logic
+      if (validatedData.role === "student") {
+        if (validatedData.studentType === "passed") {
+          // Validate that existing student ID is provided
+          if (!validatedData.existingStudentId) {
+            return res.status(400).json({ message: "Student ID is required for passed-out students" });
+          }
+          // Validate that the student ID exists in the database
+          const existingStudent = await storage.getStudentByStudentId(validatedData.existingStudentId);
+          if (!existingStudent) {
+            return res.status(400).json({ message: "Student ID not found in database" });
+          }
+          // Check if this student ID is already linked to a user
+          const existingUser = await storage.getUserByStudentId(validatedData.existingStudentId);
+          if (existingUser) {
+            return res.status(400).json({ message: "This student ID is already registered" });
+          }
+          studentIdToUse = validatedData.existingStudentId;
+        } else if (validatedData.studentType === "present") {
+          // Validate that year, section, and roll number are all provided
+          if (!validatedData.year || !validatedData.section || !validatedData.rollNumber) {
+            return res.status(400).json({ message: "Year, section, and roll number are required for present students" });
+          }
+          // Generate student ID based on year, section, and roll number
+          const currentYear = new Date().getFullYear();
+          studentIdToUse = `RJC${currentYear}${validatedData.year}${validatedData.section}${validatedData.rollNumber.padStart(3, '0')}`;
+        } else {
+          return res.status(400).json({ message: "Student type must be 'present' or 'passed'" });
+        }
+      }
       
       // Hash password
       const hashedPassword = await bcrypt.hash(validatedData.password, 10);
       
-      // Create user
-      const user = await storage.createUser({
-        ...validatedData,
+      // Create user with student ID if applicable
+      const userData: any = {
+        fullName: validatedData.fullName,
+        phoneNumber: validatedData.phoneNumber,
+        email: validatedData.email || null,
+        role: validatedData.role,
         password: hashedPassword,
-      });
-      
-      // Auto-approve principal role
-      if (validatedData.role === "principal") {
-        await storage.updateUserApprovalStatus(user.id, "approved");
+      };
+
+      if (studentIdToUse) {
+        userData.studentId = studentIdToUse;
       }
+      
+      const user = await storage.createUser(userData);
       
       // Remove password from response
       const { password, ...userWithoutPassword } = user;
       
-      const message = validatedData.role === "principal" 
-        ? "Registration successful."
-        : "Registration successful. Please wait for admin approval.";
+      let message = "Registration successful. Please wait for management approval.";
+      if (validatedData.role === "management") {
+        message = "Registration successful.";
+      } else if (user.studentId) {
+        message = `Registration successful. Your Student ID is ${user.studentId}. Please wait for management approval.`;
+      }
       
       res.status(201).json({ 
         message,
@@ -134,16 +173,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const validatedData = loginUserSchema.parse(req.body);
       
-      // Try to find user by phone, email, or username
-      let user = await storage.getUserByPhone(validatedData.identifier);
-      if (!user) {
-        user = await storage.getUserByEmail(validatedData.identifier);
-      }
-      if (!user) {
-        user = await storage.getUserByUsername(validatedData.identifier);
+      // Try to find user by phone or student ID based on role
+      let user;
+      if (validatedData.role === "student") {
+        // Try student ID first, then phone
+        user = await storage.getUserByStudentId(validatedData.identifier);
+        if (!user) {
+          user = await storage.getUserByPhone(validatedData.identifier);
+        }
+      } else {
+        // For teacher and management, only use phone
+        user = await storage.getUserByPhone(validatedData.identifier);
       }
       
       if (!user) {
+        return res.status(401).json({ message: "Invalid credentials" });
+      }
+      
+      // Verify role matches
+      if (user.role !== validatedData.role) {
         return res.status(401).json({ message: "Invalid credentials" });
       }
       
@@ -154,7 +202,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       if (user.approvalStatus !== "approved") {
-        return res.status(403).json({ message: "Account not yet approved. Please wait for admin approval." });
+        return res.status(403).json({ message: "Account not yet approved. Please wait for management approval." });
       }
       
       // Set session
@@ -225,6 +273,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(userWithoutPassword);
     } catch (error) {
       res.status(500).json({ message: "Failed to update user approval status" });
+    }
+  });
+
+  app.get("/api/students/approved", async (req, res) => {
+    try {
+      const students = await storage.getApprovedStudents();
+      const studentsWithoutPasswords = students.map(({ password, ...user }) => user);
+      res.json(studentsWithoutPasswords);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch approved students" });
     }
   });
 

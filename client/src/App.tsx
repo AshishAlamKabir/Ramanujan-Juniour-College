@@ -12,7 +12,6 @@ import About from "@/pages/about";
 import Academics from "@/pages/academics";
 import Admissions from "@/pages/admissions";
 import Students from "@/pages/students";
-import Research from "@/pages/research";
 import News from "@/pages/news";
 import Contact from "@/pages/contact";
 import Teachers from "@/pages/teachers";
@@ -35,7 +34,6 @@ function Router() {
           <Route path="/teachers" component={Teachers} />
           <Route path="/admissions" component={Admissions} />
           <Route path="/students" component={Students} />
-          <Route path="/research" component={Research} />
           <Route path="/news" component={News} />
           <Route path="/contact" component={Contact} />
           <Route path="/login" component={Login} />

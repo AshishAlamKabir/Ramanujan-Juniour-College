@@ -1,6 +1,5 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { Helmet } from "react-helmet-async";
@@ -13,35 +12,33 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { Link } from "wouter";
 import { UserPlus } from "lucide-react";
+import { registerUserSchema } from "@shared/schema";
+import type { RegisterUser } from "@shared/schema";
 
-const signupSchema = z.object({
-  fullName: z.string().min(1, "Full name is required"),
-  phoneNumber: z.string().min(10, "Valid phone number is required").optional(),
-  email: z.string().email("Valid email is required").optional(),
-  password: z.string().min(6, "Password must be at least 6 characters"),
-  role: z.enum(["student", "teacher", "management", "admin", "principal"], {
-    required_error: "Please select a role",
-  }),
-}).refine((data) => data.phoneNumber || data.email, {
-  message: "Either phone number or email is required",
-  path: ["phoneNumber"],
-});
-
-type SignupForm = z.infer<typeof signupSchema>;
+type SignupForm = RegisterUser;
 
 export default function Signup() {
   const [, navigate] = useLocation();
   const { toast } = useToast();
   
   const form = useForm<SignupForm>({
-    resolver: zodResolver(signupSchema),
+    resolver: zodResolver(registerUserSchema),
     defaultValues: {
       fullName: "",
       phoneNumber: "",
       email: "",
       password: "",
+      role: "student",
+      studentType: "present",
+      existingStudentId: "",
+      year: 1,
+      section: "",
+      rollNumber: "",
     },
   });
+
+  const selectedRole = form.watch("role");
+  const selectedStudentType = form.watch("studentType");
 
   const signupMutation = useMutation({
     mutationFn: async (data: SignupForm) => {
@@ -114,12 +111,13 @@ export default function Signup() {
                   name="phoneNumber"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Phone Number</FormLabel>
+                      <FormLabel>Phone Number *</FormLabel>
                       <FormControl>
                         <Input 
                           {...field} 
-                          placeholder="Enter your phone number"
+                          placeholder="Enter 10-digit phone number"
                           data-testid="input-phone"
+                          maxLength={10}
                         />
                       </FormControl>
                       <FormMessage />
@@ -181,8 +179,6 @@ export default function Signup() {
                           <SelectItem value="student" data-testid="option-student">Student</SelectItem>
                           <SelectItem value="teacher" data-testid="option-teacher">Teacher</SelectItem>
                           <SelectItem value="management" data-testid="option-management">Management</SelectItem>
-                          <SelectItem value="admin" data-testid="option-admin">Admin</SelectItem>
-                          <SelectItem value="principal" data-testid="option-principal">Principal</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -190,8 +186,121 @@ export default function Signup() {
                   )}
                 />
 
+                {selectedRole === "student" && (
+                  <>
+                    <FormField
+                      control={form.control}
+                      name="studentType"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Student Status *</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger data-testid="select-student-type">
+                                <SelectValue placeholder="Are you a present or passed-out student?" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="present" data-testid="option-present">Present Student</SelectItem>
+                              <SelectItem value="passed" data-testid="option-passed">Passed Out Student</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    {selectedStudentType === "passed" && (
+                      <FormField
+                        control={form.control}
+                        name="existingStudentId"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Existing Student ID *</FormLabel>
+                            <FormControl>
+                              <Input 
+                                {...field} 
+                                placeholder="Enter your student ID"
+                                data-testid="input-existing-studentid"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    )}
+
+                    {selectedStudentType === "present" && (
+                      <>
+                        <FormField
+                          control={form.control}
+                          name="year"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Year *</FormLabel>
+                              <Select onValueChange={(value) => field.onChange(parseInt(value))} defaultValue={field.value?.toString()}>
+                                <FormControl>
+                                  <SelectTrigger data-testid="select-year">
+                                    <SelectValue placeholder="Select your year" />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  <SelectItem value="1" data-testid="option-year-1">1st Year</SelectItem>
+                                  <SelectItem value="2" data-testid="option-year-2">2nd Year</SelectItem>
+                                </SelectContent>
+                              </Select>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name="section"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Section *</FormLabel>
+                              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                <FormControl>
+                                  <SelectTrigger data-testid="select-section">
+                                    <SelectValue placeholder="Select your section" />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  <SelectItem value="A" data-testid="option-section-a">Section A</SelectItem>
+                                  <SelectItem value="B" data-testid="option-section-b">Section B</SelectItem>
+                                  <SelectItem value="C" data-testid="option-section-c">Section C</SelectItem>
+                                </SelectContent>
+                              </Select>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name="rollNumber"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Roll Number *</FormLabel>
+                              <FormControl>
+                                <Input 
+                                  {...field} 
+                                  placeholder="Enter your roll number"
+                                  data-testid="input-rollnumber"
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </>
+                    )}
+                  </>
+                )}
+
                 <p className="text-xs text-gray-500 dark:text-gray-400" data-testid="note-approval">
-                  * Required fields. Note: Non-principal accounts require admin approval before access.
+                  * Required fields. Note: Student and Teacher accounts require management approval before access.
                 </p>
 
                 <Button 
@@ -209,10 +318,8 @@ export default function Signup() {
               <span className="text-gray-600 dark:text-gray-400">
                 Already have an account?{" "}
               </span>
-              <Link href="/login">
-                <a className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium" data-testid="link-login">
-                  Login here
-                </a>
+              <Link href="/login" className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium" data-testid="link-login">
+                Login here
               </Link>
             </div>
           </CardContent>

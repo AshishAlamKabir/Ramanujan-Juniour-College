@@ -40,7 +40,7 @@ export default function Header() {
     },
     { name: "Admissions", href: "/admissions" },
     { name: "Students", href: "/students" },
-    { name: "Research", href: "/research" },
+    { name: "Login/Signup", href: "/login" },
     { name: "Contact", href: "/contact" },
   ];
 

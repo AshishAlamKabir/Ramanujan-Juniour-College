@@ -10,10 +10,13 @@ export interface IStorage {
   getUserByUsername(username: string | null | undefined): Promise<User | undefined>;
   getUserByEmail(email: string | null | undefined): Promise<User | undefined>;
   getUserByPhone(phone: string | null | undefined): Promise<User | undefined>;
+  getUserByStudentId(studentId: string): Promise<User | undefined>;
   createUser(user: Partial<InsertUser>): Promise<User>;
   updateUserApprovalStatus(id: string, status: string): Promise<User | undefined>;
   getPendingUsers(): Promise<User[]>;
   getUsersByRole(role: string): Promise<User[]>;
+  getApprovedStudents(): Promise<User[]>;
+  getStudentByStudentId(studentId: string): Promise<Student | undefined>;
   
   // Notice methods
   getNotices(): Promise<Notice[]>;
@@ -378,8 +381,39 @@ export class MemStorage implements IStorage {
     );
   }
 
+  private studentIdCounter: number = 1000;
+
+  private generateStudentId(year?: number, section?: string, rollNumber?: string): string {
+    if (year && section && rollNumber) {
+      const currentYear = new Date().getFullYear();
+      return `RJC${currentYear}${year}${section}${rollNumber.padStart(3, '0')}`;
+    }
+    const currentYear = new Date().getFullYear();
+    const id = `RJC${currentYear}${String(this.studentIdCounter).padStart(4, '0')}`;
+    this.studentIdCounter++;
+    return id;
+  }
+
+  async getStudentByStudentId(studentId: string): Promise<Student | undefined> {
+    return Array.from(this.students.values()).find(
+      (student) => student.studentId === studentId
+    );
+  }
+
+  async getUserByStudentId(studentId: string): Promise<User | undefined> {
+    return Array.from(this.users.values()).find(
+      (user) => user.studentId === studentId,
+    );
+  }
+
   async createUser(insertUser: Partial<InsertUser>): Promise<User> {
     const id = randomUUID();
+    let studentId: string | null = null;
+    
+    if (insertUser.role === "student") {
+      studentId = this.generateStudentId();
+    }
+    
     const user: User = { 
       id,
       username: insertUser.username ?? null,
@@ -388,9 +422,9 @@ export class MemStorage implements IStorage {
       email: insertUser.email ?? null,
       phoneNumber: insertUser.phoneNumber ?? null,
       role: insertUser.role || "student",
-      approvalStatus: "pending",
-      facultyId: insertUser.facultyId ?? null,
-      studentId: insertUser.studentId ?? null,
+      approvalStatus: insertUser.role === "management" ? "approved" : "pending",
+      facultyId: null,
+      studentId,
       createdAt: new Date()
     };
     this.users.set(id, user);
@@ -415,6 +449,12 @@ export class MemStorage implements IStorage {
   async getUsersByRole(role: string): Promise<User[]> {
     return Array.from(this.users.values())
       .filter(user => user.role === role);
+  }
+
+  async getApprovedStudents(): Promise<User[]> {
+    return Array.from(this.users.values())
+      .filter(user => user.role === "student" && user.approvalStatus === "approved")
+      .sort((a, b) => (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0));
   }
 
   // Notice methods
@@ -865,6 +905,11 @@ export class PostgresStorage implements IStorage {
     return result[0];
   }
 
+  async getUserByStudentId(studentId: string): Promise<User | undefined> {
+    const result = await db.select().from(schema.users).where(eq(schema.users.studentId, studentId)).limit(1);
+    return result[0];
+  }
+
   async createUser(user: InsertUser): Promise<User> {
     const result = await db.insert(schema.users).values(user).returning();
     return result[0];
@@ -881,6 +926,16 @@ export class PostgresStorage implements IStorage {
 
   async getUsersByRole(role: string): Promise<User[]> {
     return await db.select().from(schema.users).where(eq(schema.users.role, role));
+  }
+
+  async getApprovedStudents(): Promise<User[]> {
+    return await db.select().from(schema.users)
+      .where(and(eq(schema.users.role, "student"), eq(schema.users.approvalStatus, "approved")));
+  }
+
+  async getStudentByStudentId(studentId: string): Promise<Student | undefined> {
+    const result = await db.select().from(schema.students).where(eq(schema.students.studentId, studentId)).limit(1);
+    return result[0];
   }
 
   // Notice methods

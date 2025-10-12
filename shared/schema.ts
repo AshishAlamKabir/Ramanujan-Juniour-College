@@ -187,17 +187,43 @@ export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
   createdAt: true,
   approvalStatus: true,
+  studentId: true,
+  facultyId: true,
 });
 
-export const registerUserSchema = insertUserSchema.extend({
-  role: z.enum(["student", "teacher", "admin", "management", "principal"]),
-  phoneNumber: z.string().min(10).optional(),
-  email: z.string().email().optional(),
+export const registerUserSchema = z.object({
+  fullName: z.string().min(2, "Name must be at least 2 characters"),
+  phoneNumber: z.string().regex(/^\d{10}$/, "Phone number must be 10 digits"),
+  email: z.string().email().optional().or(z.literal("")),
+  role: z.enum(["student", "teacher", "management"]),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+  studentType: z.enum(["present", "passed"]).optional(),
+  existingStudentId: z.string().optional(),
+  year: z.number().min(1).max(2).optional(),
+  section: z.string().optional(),
+  rollNumber: z.string().optional(),
+}).refine((data) => {
+  if (data.role === "student" && data.studentType === "passed") {
+    return !!data.existingStudentId;
+  }
+  return true;
+}, {
+  message: "Existing Student ID is required for passed-out students",
+  path: ["existingStudentId"],
+}).refine((data) => {
+  if (data.role === "student" && data.studentType === "present") {
+    return !!data.year && !!data.section && !!data.rollNumber;
+  }
+  return true;
+}, {
+  message: "Year, section, and roll number are required for present students",
+  path: ["year"],
 });
 
 export const loginUserSchema = z.object({
-  identifier: z.string().min(1),
-  password: z.string().min(1),
+  identifier: z.string().min(1, "Phone number or Student ID is required"),
+  role: z.enum(["student", "teacher", "management"]),
+  password: z.string().min(1, "Password is required"),
 });
 
 export const insertNoticeSchema = createInsertSchema(notices).omit({
