@@ -14,6 +14,7 @@ import { Link } from "wouter";
 import { UserPlus } from "lucide-react";
 import { registerUserSchema } from "@shared/schema";
 import type { RegisterUser } from "@shared/schema";
+import collegeLogo from "@assets/Screenshot 2025-10-12 163912_1760267377713.png";
 
 type SignupForm = RegisterUser;
 
@@ -76,7 +77,11 @@ export default function Signup() {
         <Card className="w-full max-w-md">
           <CardHeader className="space-y-1">
             <div className="flex items-center justify-center mb-4">
-              <UserPlus className="w-12 h-12 text-blue-600 dark:text-blue-400" />
+              <img 
+                src={collegeLogo} 
+                alt="Ramanujan Junior College" 
+                className="w-20 h-20 object-contain"
+              />
             </div>
             <CardTitle className="text-2xl text-center" data-testid="signup-title">
               Create Account

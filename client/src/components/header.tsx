@@ -12,6 +12,7 @@ import {
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
 import { cn } from "@/lib/utils";
+import collegeLogo from "@assets/Screenshot 2025-10-12 163912_1760267377713.png";
 
 export default function Header() {
   const [location] = useLocation();
@@ -51,9 +52,11 @@ export default function Header() {
           {/* Logo and College Name */}
           <Link href="/" data-testid="logo-link">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center text-primary-foreground font-bold text-lg">
-                RC
-              </div>
+              <img 
+                src={collegeLogo} 
+                alt="Ramanujan Junior College Logo" 
+                className="w-12 h-12 object-contain"
+              />
               <div>
                 <h1 className="text-lg font-bold text-foreground">Ramanujan Junior College</h1>
                 <p className="text-xs text-muted-foreground">Assam (AHSEC)</p>

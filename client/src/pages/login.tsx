@@ -14,6 +14,7 @@ import { Link } from "wouter";
 import { LogIn } from "lucide-react";
 import { loginUserSchema } from "@shared/schema";
 import type { LoginUser } from "@shared/schema";
+import collegeLogo from "@assets/Screenshot 2025-10-12 163912_1760267377713.png";
 
 type LoginForm = LoginUser;
 
@@ -68,7 +69,11 @@ export default function Login() {
         <Card className="w-full max-w-md">
           <CardHeader className="space-y-1">
             <div className="flex items-center justify-center mb-4">
-              <LogIn className="w-12 h-12 text-blue-600 dark:text-blue-400" />
+              <img 
+                src={collegeLogo} 
+                alt="Ramanujan Junior College" 
+                className="w-20 h-20 object-contain"
+              />
             </div>
             <CardTitle className="text-2xl text-center" data-testid="login-title">
               Welcome Back
