@@ -156,6 +156,28 @@ export default function Login() {
               </form>
             </Form>
 
+            <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-md">
+              <p className="text-xs font-semibold text-blue-800 dark:text-blue-200 mb-2">📋 Demo Accounts (For Testing)</p>
+              <div className="space-y-1.5 text-xs text-blue-700 dark:text-blue-300">
+                <div className="flex justify-between items-center">
+                  <span className="font-medium">Student:</span>
+                  <span className="font-mono bg-white dark:bg-gray-800 px-1.5 py-0.5 rounded">1111111111 / RJC20251000</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="font-medium">Teacher:</span>
+                  <span className="font-mono bg-white dark:bg-gray-800 px-1.5 py-0.5 rounded">2222222222</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="font-medium">Management:</span>
+                  <span className="font-mono bg-white dark:bg-gray-800 px-1.5 py-0.5 rounded">3333333333</span>
+                </div>
+                <div className="pt-1 border-t border-blue-200 dark:border-blue-800 mt-1.5">
+                  <span className="font-medium">All passwords:</span>
+                  <span className="font-mono bg-white dark:bg-gray-800 px-1.5 py-0.5 rounded ml-2">demo123</span>
+                </div>
+              </div>
+            </div>
+
             <div className="mt-6 text-center text-sm">
               <span className="text-gray-600 dark:text-gray-400">
                 Don't have an account?{" "}
