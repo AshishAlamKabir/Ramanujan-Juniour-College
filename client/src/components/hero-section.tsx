@@ -51,7 +51,7 @@ Request to parents/guardians : :
         </div>
 
         {/* Section 2: From Principal's Desk */}
-        <div className="max-w-4xl mx-auto bg-white/10 backdrop-blur-sm rounded-lg p-6 md:p-8">
+        <div className="max-w-4xl mx-auto bg-white/10 backdrop-blur-sm rounded-lg p-6 md:p-8 pl-[2px] pr-[2px] pt-[2px] pb-[2px]">
           <h2 className="md:text-3xl font-bold mb-6 text-center font-serif text-[14px]" data-testid="heading-principal-desk">
             From Principal's Desk
           </h2>
