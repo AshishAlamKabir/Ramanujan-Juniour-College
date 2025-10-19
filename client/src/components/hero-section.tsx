@@ -42,7 +42,7 @@ Request to parents/guardians : :
       <div className="relative container mx-auto px-4 py-12">
         {/* Section 1: College Branding */}
         <div className="max-w-4xl mx-auto text-center mb-10">
-          <h1 className="md:text-5xl font-bold mb-3 font-serif text-[14px]" data-testid="college-name">
+          <h1 className="md:text-5xl font-bold mb-3 font-serif text-[16px]" data-testid="college-name">
             Ramanujan Junior College
           </h1>
           <p className="md:text-xl opacity-90 text-[12px]" data-testid="vision-statement">
