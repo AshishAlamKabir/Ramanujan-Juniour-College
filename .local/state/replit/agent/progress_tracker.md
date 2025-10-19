@@ -89,3 +89,17 @@
 [x] Included shared password (demo123) for all accounts
 [x] Used visually distinct blue background box for clarity
 [x] Labeled section as "For Testing" to indicate temporary nature
+
+## Leadership & Management Profile Photos ✓
+[x] Imported Avatar component from shadcn UI library
+[x] Added profile avatars to all 6 leadership cards:
+  - Principal & Secretary (Mr. Dilip Kumar Borah) - DKB initials
+  - Vice Principal (Mrs. Sangeeta Baruah Bora) - SBB initials
+  - Controller of Examination (Mr. Parag Borah) - PB initials
+  - Co-ordinator Entrance Base Test (Mr. Parag Borah) - PB initials
+  - Joint Co-ordinator (Mr. Parag Paran Saikia) - PPS initials
+  - Career Counsellor (Mr. Ankush Kahar) - AK initials
+[x] Styled avatars with 80x80 size and colored borders (primary/accent)
+[x] Used professional initials as fallback display
+[x] Reorganized card layout with flexbox for better visual hierarchy
+[x] Maintained consistent styling across all leadership cards

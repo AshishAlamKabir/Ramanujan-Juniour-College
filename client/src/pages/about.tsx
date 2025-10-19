@@ -1,6 +1,7 @@
 // import { Helmet } from "react-helmet-async";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Calendar, Award, Users, Building, FileText, BookOpen } from "lucide-react";
 
 export default function About() {
@@ -173,8 +174,16 @@ export default function About() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="font-semibold text-lg mb-2">Mr. Dilip Kumar Borah</p>
-                    <p className="text-muted-foreground mb-3">M.Sc., B.Ed. (NET qualified)</p>
+                    <div className="flex items-start gap-4 mb-4">
+                      <Avatar className="w-20 h-20 border-2 border-primary">
+                        <AvatarImage src="" alt="Mr. Dilip Kumar Borah" />
+                        <AvatarFallback className="text-lg font-semibold bg-primary/10 text-primary">DKB</AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1">
+                        <p className="font-semibold text-lg mb-1">Mr. Dilip Kumar Borah</p>
+                        <p className="text-muted-foreground mb-3 text-sm">M.Sc., B.Ed. (NET qualified)</p>
+                      </div>
+                    </div>
                     <div className="space-y-1 text-sm">
                       <p className="text-muted-foreground">
                         <span className="font-medium">Phone:</span> 9435162455
@@ -194,8 +203,16 @@ export default function About() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="font-semibold text-lg mb-2">Mrs. Sangeeta Baruah Bora</p>
-                    <p className="text-muted-foreground mb-3">M.A</p>
+                    <div className="flex items-start gap-4 mb-4">
+                      <Avatar className="w-20 h-20 border-2 border-accent">
+                        <AvatarImage src="" alt="Mrs. Sangeeta Baruah Bora" />
+                        <AvatarFallback className="text-lg font-semibold bg-accent/10 text-accent">SBB</AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1">
+                        <p className="font-semibold text-lg mb-1">Mrs. Sangeeta Baruah Bora</p>
+                        <p className="text-muted-foreground mb-3 text-sm">M.A</p>
+                      </div>
+                    </div>
                     <div className="space-y-1 text-sm">
                       <p className="text-muted-foreground">
                         <span className="font-medium">Phone:</span> 9864240898
@@ -212,8 +229,16 @@ export default function About() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="font-semibold text-lg mb-2">Mr. Parag Borah</p>
-                    <p className="text-muted-foreground mb-3">M.Sc, B.Ed</p>
+                    <div className="flex items-start gap-4 mb-4">
+                      <Avatar className="w-20 h-20 border-2 border-primary">
+                        <AvatarImage src="" alt="Mr. Parag Borah" />
+                        <AvatarFallback className="text-lg font-semibold bg-primary/10 text-primary">PB</AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1">
+                        <p className="font-semibold text-lg mb-1">Mr. Parag Borah</p>
+                        <p className="text-muted-foreground mb-3 text-sm">M.Sc, B.Ed</p>
+                      </div>
+                    </div>
                     <div className="space-y-1 text-sm">
                       <p className="text-muted-foreground">
                         <span className="font-medium">Phone:</span> 8822140960
@@ -230,8 +255,16 @@ export default function About() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="font-semibold text-lg mb-2">Mr. Parag Borah</p>
-                    <p className="text-muted-foreground mb-3">M.Sc, B.Ed</p>
+                    <div className="flex items-start gap-4 mb-4">
+                      <Avatar className="w-20 h-20 border-2 border-accent">
+                        <AvatarImage src="" alt="Mr. Parag Borah" />
+                        <AvatarFallback className="text-lg font-semibold bg-accent/10 text-accent">PB</AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1">
+                        <p className="font-semibold text-lg mb-1">Mr. Parag Borah</p>
+                        <p className="text-muted-foreground mb-3 text-sm">M.Sc, B.Ed</p>
+                      </div>
+                    </div>
                     <div className="space-y-1 text-sm">
                       <p className="text-muted-foreground">
                         <span className="font-medium">Phone:</span> 8822140960
@@ -248,8 +281,16 @@ export default function About() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="font-semibold text-lg mb-2">Mr. Parag Paran Saikia</p>
-                    <p className="text-muted-foreground mb-3">M.Sc</p>
+                    <div className="flex items-start gap-4 mb-4">
+                      <Avatar className="w-20 h-20 border-2 border-primary">
+                        <AvatarImage src="" alt="Mr. Parag Paran Saikia" />
+                        <AvatarFallback className="text-lg font-semibold bg-primary/10 text-primary">PPS</AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1">
+                        <p className="font-semibold text-lg mb-1">Mr. Parag Paran Saikia</p>
+                        <p className="text-muted-foreground mb-3 text-sm">M.Sc</p>
+                      </div>
+                    </div>
                     <div className="space-y-1 text-sm">
                       <p className="text-muted-foreground">
                         <span className="font-medium">Phone:</span> 8486753110
@@ -266,8 +307,16 @@ export default function About() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="font-semibold text-lg mb-2">Mr. Ankush Kahar</p>
-                    <p className="text-muted-foreground mb-3">B.Tech (USA)</p>
+                    <div className="flex items-start gap-4 mb-4">
+                      <Avatar className="w-20 h-20 border-2 border-accent">
+                        <AvatarImage src="" alt="Mr. Ankush Kahar" />
+                        <AvatarFallback className="text-lg font-semibold bg-accent/10 text-accent">AK</AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1">
+                        <p className="font-semibold text-lg mb-1">Mr. Ankush Kahar</p>
+                        <p className="text-muted-foreground mb-3 text-sm">B.Tech (USA)</p>
+                      </div>
+                    </div>
                   </CardContent>
                 </Card>
               </div>
