@@ -69,7 +69,7 @@ Request to parents/guardians : :
             
             {/* Principal's Message */}
             <div className="flex-1 text-center">
-              <p className="text-sm md:text-base leading-relaxed mb-3 opacity-95 whitespace-pre-line text-justify" data-testid="text-principal-message">
+              <p className="md:text-base mb-3 opacity-95 whitespace-pre-line text-justify text-[12px]" data-testid="text-principal-message">
                 {showFullMessage ? fullMessage : previewMessage}
               </p>
               
