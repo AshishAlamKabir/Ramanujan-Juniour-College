@@ -39,7 +39,7 @@ Request to parents/guardians : :
     <section className="hero-bg text-white relative overflow-hidden">
       {/* Campus background image with overlay */}
       <div className="absolute inset-0 bg-black/20"></div>
-      <div className="relative container mx-auto px-4 py-12">
+      <div className="relative container mx-auto px-4 py-12 pl-[1px] pr-[1px] pt-[1px] pb-[1px]">
         {/* Section 1: College Branding */}
         <div className="max-w-4xl mx-auto text-center mb-10">
           <h1 className="md:text-5xl font-bold mb-3 font-serif text-[16px]" data-testid="college-name">
