@@ -219,8 +219,12 @@ function EventsManagement({
     resolver: zodResolver(eventSchema),
     defaultValues: editingEvent
       ? {
-          ...editingEvent,
+          title: editingEvent.title,
+          description: editingEvent.description,
           eventDate: new Date(editingEvent.eventDate).toISOString().slice(0, 16),
+          location: editingEvent.location,
+          category: editingEvent.category,
+          isActive: editingEvent.isActive ?? true,
         }
       : {
           title: "",
@@ -465,8 +469,12 @@ function EventsManagement({
                             onClick={() => {
                               setEditingEvent(event);
                               form.reset({
-                                ...event,
+                                title: event.title,
+                                description: event.description,
                                 eventDate: new Date(event.eventDate).toISOString().slice(0, 16),
+                                location: event.location,
+                                category: event.category,
+                                isActive: event.isActive ?? true,
                               });
                             }}
                             data-testid={`button-edit-event-${event.id}`}
@@ -513,13 +521,21 @@ function NoticesManagement({
 
   const form = useForm<NoticeForm>({
     resolver: zodResolver(noticeSchema),
-    defaultValues: editingNotice || {
-      title: "",
-      content: "",
-      category: "",
-      priority: "normal",
-      isActive: true,
-    },
+    defaultValues: editingNotice
+      ? {
+          title: editingNotice.title,
+          content: editingNotice.content,
+          category: editingNotice.category,
+          priority: (editingNotice.priority as "low" | "normal" | "high" | "urgent") || "normal",
+          isActive: editingNotice.isActive ?? true,
+        }
+      : {
+          title: "",
+          content: "",
+          category: "",
+          priority: "normal",
+          isActive: true,
+        },
   });
 
   const createMutation = useMutation({
@@ -754,7 +770,13 @@ function NoticesManagement({
                             variant="outline"
                             onClick={() => {
                               setEditingNotice(notice);
-                              form.reset(notice);
+                              form.reset({
+                                title: notice.title,
+                                content: notice.content,
+                                category: notice.category,
+                                priority: (notice.priority as "low" | "normal" | "high" | "urgent") || "normal",
+                                isActive: notice.isActive ?? true,
+                              });
                             }}
                             data-testid={`button-edit-notice-${notice.id}`}
                           >

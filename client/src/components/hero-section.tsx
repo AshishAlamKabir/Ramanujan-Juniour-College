@@ -48,6 +48,9 @@ Request to parents/guardians : :
           <p className="md:text-xl opacity-90 text-[12px]" data-testid="vision-statement">
             Education, Development and Progress
           </p>
+          <p className="md:text-base opacity-80 text-[11px] mt-1" data-testid="establishment-year">
+            Established in 2004
+          </p>
         </div>
 
         {/* Section 2: From Principal's Desk */}
@@ -69,7 +72,7 @@ Request to parents/guardians : :
             
             {/* Principal's Message */}
             <div className="flex-1 text-center">
-              <p className="md:text-base mb-3 opacity-95 whitespace-pre-line text-justify text-[12px]" data-testid="text-principal-message">
+              <p className="md:text-base mb-3 opacity-95 whitespace-pre-line text-justify text-[12px] pt-[5px] pb-[5px] pl-[10px] pr-[10px]" data-testid="text-principal-message">
                 {showFullMessage ? fullMessage : previewMessage}
               </p>
               

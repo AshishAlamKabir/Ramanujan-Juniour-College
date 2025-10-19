@@ -167,6 +167,13 @@ export default function Header() {
                       <span>Dashboard</span>
                     </Link>
                   </DropdownMenuItem>
+                  {user.role === "management" && (
+                    <DropdownMenuItem asChild>
+                      <Link href="/management" className="cursor-pointer" data-testid="nav-management">
+                        <span>Management</span>
+                      </Link>
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuSeparator />
                   <DropdownMenuItem 
                     onClick={handleLogout}
@@ -196,32 +203,47 @@ export default function Header() {
                     <p className="text-xs text-muted-foreground">
                       {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
                     </p>
-                    <div className="flex gap-2 mt-3">
-                      <Link href="/profile">
+                    <div className="flex flex-col gap-2 mt-3">
+                      <div className="flex gap-2">
+                        <Link href="/profile">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="gap-2"
+                            onClick={() => setTimeout(() => setIsOpen(false), 100)}
+                            data-testid="mobile-nav-profile"
+                          >
+                            <User className="h-4 w-4" />
+                            Profile
+                          </Button>
+                        </Link>
                         <Button
                           variant="outline"
                           size="sm"
-                          className="gap-2"
-                          onClick={() => setTimeout(() => setIsOpen(false), 100)}
-                          data-testid="mobile-nav-profile"
+                          className="gap-2 text-red-600 dark:text-red-400"
+                          onClick={() => {
+                            handleLogout();
+                            setTimeout(() => setIsOpen(false), 100);
+                          }}
+                          data-testid="mobile-nav-logout"
                         >
-                          <User className="h-4 w-4" />
-                          Profile
+                          <LogOut className="h-4 w-4" />
+                          Logout
                         </Button>
-                      </Link>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="gap-2 text-red-600 dark:text-red-400"
-                        onClick={() => {
-                          handleLogout();
-                          setTimeout(() => setIsOpen(false), 100);
-                        }}
-                        data-testid="mobile-nav-logout"
-                      >
-                        <LogOut className="h-4 w-4" />
-                        Logout
-                      </Button>
+                      </div>
+                      {user.role === "management" && (
+                        <Link href="/management">
+                          <Button
+                            variant="default"
+                            size="sm"
+                            className="w-full gap-2"
+                            onClick={() => setTimeout(() => setIsOpen(false), 100)}
+                            data-testid="mobile-nav-management"
+                          >
+                            Management
+                          </Button>
+                        </Link>
+                      )}
                     </div>
                   </div>
                 )}

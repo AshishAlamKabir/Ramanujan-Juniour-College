@@ -20,6 +20,7 @@ import Login from "@/pages/login";
 import Signup from "@/pages/signup";
 import Dashboard from "@/pages/dashboard";
 import Profile from "@/pages/profile";
+import Management from "@/pages/management";
 import RateTeacher from "@/pages/rate-teacher";
 import Payments from "@/pages/payments";
 import NotFound from "@/pages/not-found";
@@ -42,6 +43,7 @@ function Router() {
           <Route path="/signup" component={Signup} />
           <Route path="/dashboard" component={Dashboard} />
           <Route path="/profile" component={Profile} />
+          <Route path="/management" component={Management} />
           <Route path="/rate/:token" component={RateTeacher} />
           <Route path="/payments" component={Payments} />
           <Route component={NotFound} />
