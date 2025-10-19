@@ -1,7 +1,7 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { registerUserSchema, loginUserSchema, insertNoticeSchema, insertEventSchema, insertNewsSchema, insertDepartmentSchema, insertCourseSchema, insertFacultySchema, insertFacilitySchema, insertGalleryImageSchema, insertStudentSchema, insertTeacherRatingSchema, insertRatingLinkSchema, insertStudentDueSchema, insertPaymentSchema, type User } from "@shared/schema";
+import { registerUserSchema, loginUserSchema, insertNoticeSchema, insertEventSchema, insertNewsSchema, insertDepartmentSchema, insertCourseSchema, insertFacultySchema, insertFacilitySchema, insertGalleryImageSchema, insertStudentSchema, insertTeacherRatingSchema, insertRatingLinkSchema, insertStudentDueSchema, insertPaymentSchema, insertContactFormSchema, insertTimetableSchema, insertAcademicCalendarSchema, insertAdmissionSchema, type User } from "@shared/schema";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
 import session from "express-session";
@@ -39,19 +39,17 @@ function requireRole(...roles: string[]) {
   };
 }
 
-function requireApproved(req: Request, res: Response, next: NextFunction) {
-  return async (req: Request, res: Response, next: NextFunction) => {
-    if (!req.session.userId) {
-      return res.status(401).json({ message: "Authentication required" });
-    }
-    
-    const user = await storage.getUser(req.session.userId);
-    if (!user || user.approvalStatus !== "approved") {
-      return res.status(403).json({ message: "Account not yet approved" });
-    }
-    
-    next();
-  };
+async function requireApproved(req: Request, res: Response, next: NextFunction) {
+  if (!req.session.userId) {
+    return res.status(401).json({ message: "Authentication required" });
+  }
+  
+  const user = await storage.getUser(req.session.userId);
+  if (!user || user.approvalStatus !== "approved") {
+    return res.status(403).json({ message: "Account not yet approved" });
+  }
+  
+  next();
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -68,6 +66,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
+        sameSite: "strict", // CSRF protection
       },
     })
   );
@@ -321,6 +320,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.patch("/api/notices/:id", requireRole("management", "admin"), async (req, res) => {
+    try {
+      const validatedData = insertNoticeSchema.partial().parse(req.body);
+      const notice = await storage.updateNotice(req.params.id, validatedData);
+      if (!notice) {
+        return res.status(404).json({ message: "Notice not found" });
+      }
+      res.json(notice);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to update notice" });
+    }
+  });
+
+  app.delete("/api/notices/:id", requireRole("management", "admin"), async (req, res) => {
+    try {
+      const success = await storage.deleteNotice(req.params.id);
+      if (!success) {
+        return res.status(404).json({ message: "Notice not found" });
+      }
+      res.json({ message: "Notice deleted successfully" });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete notice" });
+    }
+  });
+
   // Event routes
   app.get("/api/events", async (req, res) => {
     try {
@@ -356,6 +383,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.patch("/api/events/:id", requireRole("management", "admin"), async (req, res) => {
+    try {
+      const validatedData = insertEventSchema.partial().parse(req.body);
+      const event = await storage.updateEvent(req.params.id, validatedData);
+      if (!event) {
+        return res.status(404).json({ message: "Event not found" });
+      }
+      res.json(event);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to update event" });
+    }
+  });
+
+  app.delete("/api/events/:id", requireRole("management", "admin"), async (req, res) => {
+    try {
+      const success = await storage.deleteEvent(req.params.id);
+      if (!success) {
+        return res.status(404).json({ message: "Event not found" });
+      }
+      res.json({ message: "Event deleted successfully" });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete event" });
+    }
+  });
+
   // News routes
   app.get("/api/news", async (req, res) => {
     try {
@@ -387,7 +442,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/news", async (req, res) => {
+  app.post("/api/news", requireRole("management", "admin"), async (req, res) => {
     try {
       const validatedData = insertNewsSchema.parse(req.body);
       const newsItem = await storage.createNews(validatedData);
@@ -422,7 +477,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/departments", async (req, res) => {
+  app.post("/api/departments", requireRole("management", "admin"), async (req, res) => {
     try {
       const validatedData = insertDepartmentSchema.parse(req.body);
       const department = await storage.createDepartment(validatedData);
@@ -463,7 +518,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/courses", async (req, res) => {
+  app.post("/api/courses", requireRole("management", "admin"), async (req, res) => {
     try {
       const validatedData = insertCourseSchema.parse(req.body);
       const course = await storage.createCourse(validatedData);
@@ -504,7 +559,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/faculty", async (req, res) => {
+  app.post("/api/faculty", requireRole("management", "admin"), async (req, res) => {
     try {
       const validatedData = insertFacultySchema.parse(req.body);
       const facultyMember = await storage.createFaculty(validatedData);
@@ -514,6 +569,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid data", errors: error.errors });
       }
       res.status(500).json({ message: "Failed to create faculty member" });
+    }
+  });
+
+  app.patch("/api/faculty/:id", requireRole("management", "admin"), async (req, res) => {
+    try {
+      const validatedData = insertFacultySchema.partial().parse(req.body);
+      const facultyMember = await storage.updateFaculty(req.params.id, validatedData);
+      if (!facultyMember) {
+        return res.status(404).json({ message: "Faculty member not found" });
+      }
+      res.json(facultyMember);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to update faculty member" });
+    }
+  });
+
+  app.delete("/api/faculty/:id", requireRole("management", "admin"), async (req, res) => {
+    try {
+      const success = await storage.deleteFaculty(req.params.id);
+      if (!success) {
+        return res.status(404).json({ message: "Faculty member not found" });
+      }
+      res.json({ message: "Faculty member deleted successfully" });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete faculty member" });
     }
   });
 
@@ -545,7 +628,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/facilities", async (req, res) => {
+  app.post("/api/facilities", requireRole("management", "admin"), async (req, res) => {
     try {
       const validatedData = insertFacilitySchema.parse(req.body);
       const facility = await storage.createFacility(validatedData);
@@ -636,7 +719,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/students", async (req, res) => {
+  app.post("/api/students", requireRole("management", "admin"), async (req, res) => {
     try {
       const validatedData = insertStudentSchema.parse(req.body);
       const student = await storage.createStudent(validatedData);
@@ -646,6 +729,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid data", errors: error.errors });
       }
       res.status(500).json({ message: "Failed to create student" });
+    }
+  });
+
+  app.patch("/api/students/:id", requireRole("management", "admin"), async (req, res) => {
+    try {
+      const validatedData = insertStudentSchema.partial().parse(req.body);
+      const student = await storage.updateStudent(req.params.id, validatedData);
+      if (!student) {
+        return res.status(404).json({ message: "Student not found" });
+      }
+      res.json(student);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to update student" });
+    }
+  });
+
+  app.delete("/api/students/:id", requireRole("management", "admin"), async (req, res) => {
+    try {
+      const success = await storage.deleteStudent(req.params.id);
+      if (!success) {
+        return res.status(404).json({ message: "Student not found" });
+      }
+      res.json({ message: "Student deleted successfully" });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete student" });
     }
   });
 
@@ -843,6 +954,266 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(rankedFaculty);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch ranked faculty" });
+    }
+  });
+
+  // Contact Form routes
+  app.get("/api/contact-forms", requireRole("management", "admin"), async (req, res) => {
+    try {
+      const forms = await storage.getContactForms();
+      res.json(forms);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch contact forms" });
+    }
+  });
+
+  app.get("/api/contact-forms/:id", requireRole("management", "admin"), async (req, res) => {
+    try {
+      const form = await storage.getContactForm(req.params.id);
+      if (!form) {
+        return res.status(404).json({ message: "Contact form not found" });
+      }
+      res.json(form);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch contact form" });
+    }
+  });
+
+  app.post("/api/contact-forms", async (req, res) => {
+    try {
+      const validatedData = insertContactFormSchema.parse(req.body);
+      const form = await storage.createContactForm(validatedData);
+      res.status(201).json(form);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to submit contact form" });
+    }
+  });
+
+  app.patch("/api/contact-forms/:id/status", requireRole("management", "admin"), async (req, res) => {
+    try {
+      const { status } = req.body;
+      const form = await storage.updateContactFormStatus(req.params.id, status);
+      if (!form) {
+        return res.status(404).json({ message: "Contact form not found" });
+      }
+      res.json(form);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to update contact form status" });
+    }
+  });
+
+  app.delete("/api/contact-forms/:id", requireRole("management", "admin"), async (req, res) => {
+    try {
+      const success = await storage.deleteContactForm(req.params.id);
+      if (!success) {
+        return res.status(404).json({ message: "Contact form not found" });
+      }
+      res.json({ message: "Contact form deleted successfully" });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete contact form" });
+    }
+  });
+
+  // Timetable routes
+  app.get("/api/timetables", async (req, res) => {
+    try {
+      const { stream, section, year } = req.query;
+      const filters: any = {};
+      if (stream && typeof stream === 'string') filters.stream = stream;
+      if (section && typeof section === 'string') filters.section = section;
+      if (year && typeof year === 'string') filters.year = parseInt(year);
+      
+      const timetables = await storage.getTimetables(filters);
+      res.json(timetables);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch timetables" });
+    }
+  });
+
+  app.get("/api/timetables/:id", async (req, res) => {
+    try {
+      const timetable = await storage.getTimetable(req.params.id);
+      if (!timetable) {
+        return res.status(404).json({ message: "Timetable not found" });
+      }
+      res.json(timetable);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch timetable" });
+    }
+  });
+
+  app.post("/api/timetables", requireRole("management", "admin"), async (req, res) => {
+    try {
+      const validatedData = insertTimetableSchema.parse(req.body);
+      const timetable = await storage.createTimetable(validatedData);
+      res.status(201).json(timetable);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create timetable" });
+    }
+  });
+
+  app.patch("/api/timetables/:id", requireRole("management", "admin"), async (req, res) => {
+    try {
+      const validatedData = insertTimetableSchema.partial().parse(req.body);
+      const timetable = await storage.updateTimetable(req.params.id, validatedData);
+      if (!timetable) {
+        return res.status(404).json({ message: "Timetable not found" });
+      }
+      res.json(timetable);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to update timetable" });
+    }
+  });
+
+  app.delete("/api/timetables/:id", requireRole("management", "admin"), async (req, res) => {
+    try {
+      const success = await storage.deleteTimetable(req.params.id);
+      if (!success) {
+        return res.status(404).json({ message: "Timetable not found" });
+      }
+      res.json({ message: "Timetable deleted successfully" });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete timetable" });
+    }
+  });
+
+  // Academic Calendar routes
+  app.get("/api/academic-calendar", async (req, res) => {
+    try {
+      const { academicYear } = req.query;
+      const filters: any = {};
+      if (academicYear && typeof academicYear === 'string') filters.academicYear = academicYear;
+      
+      const calendars = await storage.getAcademicCalendars(filters);
+      res.json(calendars);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch academic calendar" });
+    }
+  });
+
+  app.get("/api/academic-calendar/:id", async (req, res) => {
+    try {
+      const calendar = await storage.getAcademicCalendar(req.params.id);
+      if (!calendar) {
+        return res.status(404).json({ message: "Academic calendar entry not found" });
+      }
+      res.json(calendar);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch academic calendar entry" });
+    }
+  });
+
+  app.post("/api/academic-calendar", requireRole("management", "admin"), async (req, res) => {
+    try {
+      const validatedData = insertAcademicCalendarSchema.parse(req.body);
+      const calendar = await storage.createAcademicCalendar(validatedData);
+      res.status(201).json(calendar);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create academic calendar entry" });
+    }
+  });
+
+  app.patch("/api/academic-calendar/:id", requireRole("management", "admin"), async (req, res) => {
+    try {
+      const validatedData = insertAcademicCalendarSchema.partial().parse(req.body);
+      const calendar = await storage.updateAcademicCalendar(req.params.id, validatedData);
+      if (!calendar) {
+        return res.status(404).json({ message: "Academic calendar entry not found" });
+      }
+      res.json(calendar);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to update academic calendar entry" });
+    }
+  });
+
+  app.delete("/api/academic-calendar/:id", requireRole("management", "admin"), async (req, res) => {
+    try {
+      const success = await storage.deleteAcademicCalendar(req.params.id);
+      if (!success) {
+        return res.status(404).json({ message: "Academic calendar entry not found" });
+      }
+      res.json({ message: "Academic calendar entry deleted successfully" });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete academic calendar entry" });
+    }
+  });
+
+  // Admission routes
+  app.get("/api/admissions", requireRole("management", "admin"), async (req, res) => {
+    try {
+      const admissions = await storage.getAdmissions();
+      res.json(admissions);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch admissions" });
+    }
+  });
+
+  app.get("/api/admissions/:id", requireRole("management", "admin"), async (req, res) => {
+    try {
+      const admission = await storage.getAdmission(req.params.id);
+      if (!admission) {
+        return res.status(404).json({ message: "Admission not found" });
+      }
+      res.json(admission);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch admission" });
+    }
+  });
+
+  app.post("/api/admissions", async (req, res) => {
+    try {
+      const validatedData = insertAdmissionSchema.parse(req.body);
+      const admission = await storage.createAdmission(validatedData);
+      res.status(201).json(admission);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to submit admission" });
+    }
+  });
+
+  app.patch("/api/admissions/:id/status", requireRole("management", "admin"), async (req, res) => {
+    try {
+      if (!req.session.userId) {
+        return res.status(401).json({ message: "Authentication required" });
+      }
+      
+      const { status } = req.body;
+      const admission = await storage.updateAdmissionStatus(req.params.id, status, req.session.userId);
+      if (!admission) {
+        return res.status(404).json({ message: "Admission not found" });
+      }
+      res.json(admission);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to update admission status" });
+    }
+  });
+
+  app.delete("/api/admissions/:id", requireRole("management", "admin"), async (req, res) => {
+    try {
+      const success = await storage.deleteAdmission(req.params.id);
+      if (!success) {
+        return res.status(404).json({ message: "Admission not found" });
+      }
+      res.json({ message: "Admission deleted successfully" });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete admission" });
     }
   });
 

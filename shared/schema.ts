@@ -182,6 +182,62 @@ export const payments = pgTable("payments", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+export const contactForms = pgTable("contact_forms", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: text("name").notNull(),
+  email: text("email").notNull(),
+  phone: text("phone"),
+  subject: text("subject").notNull(),
+  message: text("message").notNull(),
+  status: text("status").notNull().default("new"),
+  submittedAt: timestamp("submitted_at").defaultNow(),
+});
+
+export const timetable = pgTable("timetable", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  stream: text("stream").notNull(),
+  section: text("section").notNull(),
+  year: integer("year").notNull(),
+  day: text("day").notNull(),
+  timeSlot: text("time_slot").notNull(),
+  subject: text("subject").notNull(),
+  facultyId: varchar("faculty_id").references(() => faculty.id),
+  room: text("room"),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const academicCalendar = pgTable("academic_calendar", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  title: text("title").notNull(),
+  description: text("description"),
+  startDate: timestamp("start_date").notNull(),
+  endDate: timestamp("end_date"),
+  eventType: text("event_type").notNull(),
+  academicYear: text("academic_year").notNull(),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const admissions = pgTable("admissions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  fullName: text("full_name").notNull(),
+  email: text("email").notNull(),
+  phone: text("phone").notNull(),
+  dateOfBirth: timestamp("date_of_birth").notNull(),
+  gender: text("gender").notNull(),
+  address: text("address").notNull(),
+  stream: text("stream").notNull(),
+  previousSchool: text("previous_school"),
+  previousMarks: text("previous_marks"),
+  guardianName: text("guardian_name").notNull(),
+  guardianPhone: text("guardian_phone").notNull(),
+  status: text("status").notNull().default("pending"),
+  submittedAt: timestamp("submitted_at").defaultNow(),
+  reviewedBy: varchar("reviewed_by").references(() => users.id),
+  reviewedAt: timestamp("reviewed_at"),
+});
+
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
@@ -287,6 +343,27 @@ export const insertPaymentSchema = createInsertSchema(payments).omit({
   paidAt: true,
 });
 
+export const insertContactFormSchema = createInsertSchema(contactForms).omit({
+  id: true,
+  submittedAt: true,
+});
+
+export const insertTimetableSchema = createInsertSchema(timetable).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertAcademicCalendarSchema = createInsertSchema(academicCalendar).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertAdmissionSchema = createInsertSchema(admissions).omit({
+  id: true,
+  submittedAt: true,
+  reviewedAt: true,
+});
+
 // Types
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type RegisterUser = z.infer<typeof registerUserSchema>;
@@ -318,3 +395,11 @@ export type InsertStudentDue = z.infer<typeof insertStudentDueSchema>;
 export type StudentDue = typeof studentDues.$inferSelect;
 export type InsertPayment = z.infer<typeof insertPaymentSchema>;
 export type Payment = typeof payments.$inferSelect;
+export type InsertContactForm = z.infer<typeof insertContactFormSchema>;
+export type ContactForm = typeof contactForms.$inferSelect;
+export type InsertTimetable = z.infer<typeof insertTimetableSchema>;
+export type Timetable = typeof timetable.$inferSelect;
+export type InsertAcademicCalendar = z.infer<typeof insertAcademicCalendarSchema>;
+export type AcademicCalendar = typeof academicCalendar.$inferSelect;
+export type InsertAdmission = z.infer<typeof insertAdmissionSchema>;
+export type Admission = typeof admissions.$inferSelect;

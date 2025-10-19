@@ -1,4 +1,4 @@
-import { type User, type InsertUser, type Notice, type InsertNotice, type Event, type InsertEvent, type News, type InsertNews, type Department, type InsertDepartment, type Course, type InsertCourse, type Faculty, type InsertFaculty, type Facility, type InsertFacility, type GalleryImage, type InsertGalleryImage, type Student, type InsertStudent, type TeacherRating, type InsertTeacherRating, type RatingLink, type InsertRatingLink, type StudentDue, type InsertStudentDue, type Payment, type InsertPayment } from "@shared/schema";
+import { type User, type InsertUser, type Notice, type InsertNotice, type Event, type InsertEvent, type News, type InsertNews, type Department, type InsertDepartment, type Course, type InsertCourse, type Faculty, type InsertFaculty, type Facility, type InsertFacility, type GalleryImage, type InsertGalleryImage, type Student, type InsertStudent, type TeacherRating, type InsertTeacherRating, type RatingLink, type InsertRatingLink, type StudentDue, type InsertStudentDue, type Payment, type InsertPayment, type ContactForm, type InsertContactForm, type Timetable, type InsertTimetable, type AcademicCalendar, type InsertAcademicCalendar, type Admission, type InsertAdmission } from "@shared/schema";
 import { randomUUID } from "crypto";
 import { db } from "./db";
 import { eq, and } from "drizzle-orm";
@@ -23,11 +23,15 @@ export interface IStorage {
   getNotices(): Promise<Notice[]>;
   getNotice(id: string): Promise<Notice | undefined>;
   createNotice(notice: InsertNotice): Promise<Notice>;
+  updateNotice(id: string, notice: Partial<InsertNotice>): Promise<Notice | undefined>;
+  deleteNotice(id: string): Promise<boolean>;
   
   // Event methods
   getEvents(): Promise<Event[]>;
   getEvent(id: string): Promise<Event | undefined>;
   createEvent(event: InsertEvent): Promise<Event>;
+  updateEvent(id: string, event: Partial<InsertEvent>): Promise<Event | undefined>;
+  deleteEvent(id: string): Promise<boolean>;
   
   // News methods
   getNews(): Promise<News[]>;
@@ -51,6 +55,8 @@ export interface IStorage {
   getFacultyMember(id: string): Promise<Faculty | undefined>;
   getFacultyByDepartment(departmentId: string): Promise<Faculty[]>;
   createFaculty(faculty: InsertFaculty): Promise<Faculty>;
+  updateFaculty(id: string, faculty: Partial<InsertFaculty>): Promise<Faculty | undefined>;
+  deleteFaculty(id: string): Promise<boolean>;
   
   // Facility methods
   getFacilities(): Promise<Facility[]>;
@@ -68,6 +74,8 @@ export interface IStorage {
   getStudents(filters?: { stream?: string; section?: string; year?: number; graduationYear?: number; status?: string }): Promise<Student[]>;
   getStudent(id: string): Promise<Student | undefined>;
   createStudent(student: InsertStudent): Promise<Student>;
+  updateStudent(id: string, student: Partial<InsertStudent>): Promise<Student | undefined>;
+  deleteStudent(id: string): Promise<boolean>;
   
   // Teacher Rating methods
   createRating(rating: InsertTeacherRating): Promise<TeacherRating>;
@@ -89,6 +97,34 @@ export interface IStorage {
   getPaymentsByStudent(studentId: string): Promise<Payment[]>;
   getPendingPayments(): Promise<Payment[]>;
   verifyPayment(id: string, verifiedBy: string): Promise<Payment | undefined>;
+  
+  // Contact Form methods
+  getContactForms(): Promise<ContactForm[]>;
+  getContactForm(id: string): Promise<ContactForm | undefined>;
+  createContactForm(form: InsertContactForm): Promise<ContactForm>;
+  updateContactFormStatus(id: string, status: string): Promise<ContactForm | undefined>;
+  deleteContactForm(id: string): Promise<boolean>;
+  
+  // Timetable methods
+  getTimetables(filters?: { stream?: string; section?: string; year?: number }): Promise<Timetable[]>;
+  getTimetable(id: string): Promise<Timetable | undefined>;
+  createTimetable(timetable: InsertTimetable): Promise<Timetable>;
+  updateTimetable(id: string, timetable: Partial<InsertTimetable>): Promise<Timetable | undefined>;
+  deleteTimetable(id: string): Promise<boolean>;
+  
+  // Academic Calendar methods
+  getAcademicCalendars(filters?: { academicYear?: string }): Promise<AcademicCalendar[]>;
+  getAcademicCalendar(id: string): Promise<AcademicCalendar | undefined>;
+  createAcademicCalendar(calendar: InsertAcademicCalendar): Promise<AcademicCalendar>;
+  updateAcademicCalendar(id: string, calendar: Partial<InsertAcademicCalendar>): Promise<AcademicCalendar | undefined>;
+  deleteAcademicCalendar(id: string): Promise<boolean>;
+  
+  // Admission methods
+  getAdmissions(): Promise<Admission[]>;
+  getAdmission(id: string): Promise<Admission | undefined>;
+  createAdmission(admission: InsertAdmission): Promise<Admission>;
+  updateAdmissionStatus(id: string, status: string, reviewedBy: string): Promise<Admission | undefined>;
+  deleteAdmission(id: string): Promise<boolean>;
 }
 
 export class MemStorage implements IStorage {
@@ -106,6 +142,10 @@ export class MemStorage implements IStorage {
   private ratingLinks: Map<string, RatingLink>;
   private studentDues: Map<string, StudentDue>;
   private payments: Map<string, Payment>;
+  private contactForms: Map<string, ContactForm>;
+  private timetables: Map<string, Timetable>;
+  private academicCalendars: Map<string, AcademicCalendar>;
+  private admissions: Map<string, Admission>;
 
   constructor() {
     this.users = new Map();
@@ -122,6 +162,10 @@ export class MemStorage implements IStorage {
     this.ratingLinks = new Map();
     this.studentDues = new Map();
     this.payments = new Map();
+    this.contactForms = new Map();
+    this.timetables = new Map();
+    this.academicCalendars = new Map();
+    this.admissions = new Map();
     
     // Initialize with some basic data structure
     this.initializeData();
@@ -536,6 +580,22 @@ export class MemStorage implements IStorage {
     return notice;
   }
 
+  async updateNotice(id: string, updateData: Partial<InsertNotice>): Promise<Notice | undefined> {
+    const notice = this.notices.get(id);
+    if (!notice) return undefined;
+    
+    const updatedNotice: Notice = {
+      ...notice,
+      ...updateData
+    };
+    this.notices.set(id, updatedNotice);
+    return updatedNotice;
+  }
+
+  async deleteNotice(id: string): Promise<boolean> {
+    return this.notices.delete(id);
+  }
+
   // Event methods
   async getEvents(): Promise<Event[]> {
     return Array.from(this.events.values())
@@ -556,6 +616,22 @@ export class MemStorage implements IStorage {
     };
     this.events.set(id, event);
     return event;
+  }
+
+  async updateEvent(id: string, updateData: Partial<InsertEvent>): Promise<Event | undefined> {
+    const event = this.events.get(id);
+    if (!event) return undefined;
+    
+    const updatedEvent: Event = {
+      ...event,
+      ...updateData
+    };
+    this.events.set(id, updatedEvent);
+    return updatedEvent;
+  }
+
+  async deleteEvent(id: string): Promise<boolean> {
+    return this.events.delete(id);
   }
 
   // News methods
@@ -684,6 +760,22 @@ export class MemStorage implements IStorage {
     return facultyMember;
   }
 
+  async updateFaculty(id: string, updateData: Partial<InsertFaculty>): Promise<Faculty | undefined> {
+    const facultyMember = this.faculty.get(id);
+    if (!facultyMember) return undefined;
+    
+    const updatedFaculty: Faculty = {
+      ...facultyMember,
+      ...updateData
+    };
+    this.faculty.set(id, updatedFaculty);
+    return updatedFaculty;
+  }
+
+  async deleteFaculty(id: string): Promise<boolean> {
+    return this.faculty.delete(id);
+  }
+
   // Facility methods
   async getFacilities(): Promise<Facility[]> {
     return Array.from(this.facilities.values())
@@ -787,6 +879,22 @@ export class MemStorage implements IStorage {
     };
     this.students.set(id, student);
     return student;
+  }
+
+  async updateStudent(id: string, updateData: Partial<InsertStudent>): Promise<Student | undefined> {
+    const student = this.students.get(id);
+    if (!student) return undefined;
+    
+    const updatedStudent: Student = {
+      ...student,
+      ...updateData
+    };
+    this.students.set(id, updatedStudent);
+    return updatedStudent;
+  }
+
+  async deleteStudent(id: string): Promise<boolean> {
+    return this.students.delete(id);
   }
 
   // Teacher Rating methods
@@ -932,6 +1040,185 @@ export class MemStorage implements IStorage {
     await this.updateDueStatus(payment.dueId, "paid");
     
     return updatedPayment;
+  }
+
+  // Contact Form methods
+  async getContactForms(): Promise<ContactForm[]> {
+    return Array.from(this.contactForms.values())
+      .sort((a, b) => (b.submittedAt?.getTime() || 0) - (a.submittedAt?.getTime() || 0));
+  }
+
+  async getContactForm(id: string): Promise<ContactForm | undefined> {
+    return this.contactForms.get(id);
+  }
+
+  async createContactForm(insertForm: InsertContactForm): Promise<ContactForm> {
+    const id = randomUUID();
+    const form: ContactForm = {
+      ...insertForm,
+      id,
+      phone: insertForm.phone || null,
+      status: insertForm.status || "new",
+      submittedAt: new Date()
+    };
+    this.contactForms.set(id, form);
+    return form;
+  }
+
+  async updateContactFormStatus(id: string, status: string): Promise<ContactForm | undefined> {
+    const form = this.contactForms.get(id);
+    if (!form) return undefined;
+    
+    const updatedForm: ContactForm = {
+      ...form,
+      status
+    };
+    this.contactForms.set(id, updatedForm);
+    return updatedForm;
+  }
+
+  async deleteContactForm(id: string): Promise<boolean> {
+    return this.contactForms.delete(id);
+  }
+
+  // Timetable methods
+  async getTimetables(filters?: { stream?: string; section?: string; year?: number }): Promise<Timetable[]> {
+    let timetables = Array.from(this.timetables.values()).filter(t => t.isActive);
+    
+    if (filters?.stream) {
+      timetables = timetables.filter(t => t.stream === filters.stream);
+    }
+    if (filters?.section) {
+      timetables = timetables.filter(t => t.section === filters.section);
+    }
+    if (filters?.year !== undefined) {
+      timetables = timetables.filter(t => t.year === filters.year);
+    }
+    
+    return timetables;
+  }
+
+  async getTimetable(id: string): Promise<Timetable | undefined> {
+    return this.timetables.get(id);
+  }
+
+  async createTimetable(insertTimetable: InsertTimetable): Promise<Timetable> {
+    const id = randomUUID();
+    const timetable: Timetable = {
+      ...insertTimetable,
+      id,
+      facultyId: insertTimetable.facultyId || null,
+      room: insertTimetable.room || null,
+      isActive: insertTimetable.isActive !== undefined ? insertTimetable.isActive : true,
+      createdAt: new Date()
+    };
+    this.timetables.set(id, timetable);
+    return timetable;
+  }
+
+  async updateTimetable(id: string, updateData: Partial<InsertTimetable>): Promise<Timetable | undefined> {
+    const timetable = this.timetables.get(id);
+    if (!timetable) return undefined;
+    
+    const updatedTimetable: Timetable = {
+      ...timetable,
+      ...updateData
+    };
+    this.timetables.set(id, updatedTimetable);
+    return updatedTimetable;
+  }
+
+  async deleteTimetable(id: string): Promise<boolean> {
+    return this.timetables.delete(id);
+  }
+
+  // Academic Calendar methods
+  async getAcademicCalendars(filters?: { academicYear?: string }): Promise<AcademicCalendar[]> {
+    let calendars = Array.from(this.academicCalendars.values()).filter(c => c.isActive);
+    
+    if (filters?.academicYear) {
+      calendars = calendars.filter(c => c.academicYear === filters.academicYear);
+    }
+    
+    return calendars.sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
+  }
+
+  async getAcademicCalendar(id: string): Promise<AcademicCalendar | undefined> {
+    return this.academicCalendars.get(id);
+  }
+
+  async createAcademicCalendar(insertCalendar: InsertAcademicCalendar): Promise<AcademicCalendar> {
+    const id = randomUUID();
+    const calendar: AcademicCalendar = {
+      ...insertCalendar,
+      id,
+      description: insertCalendar.description || null,
+      endDate: insertCalendar.endDate || null,
+      isActive: insertCalendar.isActive !== undefined ? insertCalendar.isActive : true,
+      createdAt: new Date()
+    };
+    this.academicCalendars.set(id, calendar);
+    return calendar;
+  }
+
+  async updateAcademicCalendar(id: string, updateData: Partial<InsertAcademicCalendar>): Promise<AcademicCalendar | undefined> {
+    const calendar = this.academicCalendars.get(id);
+    if (!calendar) return undefined;
+    
+    const updatedCalendar: AcademicCalendar = {
+      ...calendar,
+      ...updateData
+    };
+    this.academicCalendars.set(id, updatedCalendar);
+    return updatedCalendar;
+  }
+
+  async deleteAcademicCalendar(id: string): Promise<boolean> {
+    return this.academicCalendars.delete(id);
+  }
+
+  // Admission methods
+  async getAdmissions(): Promise<Admission[]> {
+    return Array.from(this.admissions.values())
+      .sort((a, b) => (b.submittedAt?.getTime() || 0) - (a.submittedAt?.getTime() || 0));
+  }
+
+  async getAdmission(id: string): Promise<Admission | undefined> {
+    return this.admissions.get(id);
+  }
+
+  async createAdmission(insertAdmission: InsertAdmission): Promise<Admission> {
+    const id = randomUUID();
+    const admission: Admission = {
+      ...insertAdmission,
+      id,
+      previousSchool: insertAdmission.previousSchool || null,
+      previousMarks: insertAdmission.previousMarks || null,
+      status: insertAdmission.status || "pending",
+      reviewedBy: insertAdmission.reviewedBy || null,
+      reviewedAt: null,
+      submittedAt: new Date()
+    };
+    this.admissions.set(id, admission);
+    return admission;
+  }
+
+  async updateAdmissionStatus(id: string, status: string, reviewedBy: string): Promise<Admission | undefined> {
+    const admission = this.admissions.get(id);
+    if (!admission) return undefined;
+    
+    const updatedAdmission: Admission = {
+      ...admission,
+      status,
+      reviewedBy,
+      reviewedAt: new Date()
+    };
+    this.admissions.set(id, updatedAdmission);
+    return updatedAdmission;
+  }
+
+  async deleteAdmission(id: string): Promise<boolean> {
+    return this.admissions.delete(id);
   }
 }
 
@@ -1275,6 +1562,149 @@ export class PostgresStorage implements IStorage {
     }
     
     return result[0];
+  }
+
+  // TODO: Implement PostgresStorage update/delete methods for existing entities
+  async updateNotice(id: string, notice: Partial<InsertNotice>): Promise<Notice | undefined> {
+    const result = await db.update(schema.notices).set(notice).where(eq(schema.notices.id, id)).returning();
+    return result[0];
+  }
+
+  async deleteNotice(id: string): Promise<boolean> {
+    await db.delete(schema.notices).where(eq(schema.notices.id, id));
+    return true;
+  }
+
+  async updateEvent(id: string, event: Partial<InsertEvent>): Promise<Event | undefined> {
+    const result = await db.update(schema.events).set(event).where(eq(schema.events.id, id)).returning();
+    return result[0];
+  }
+
+  async deleteEvent(id: string): Promise<boolean> {
+    await db.delete(schema.events).where(eq(schema.events.id, id));
+    return true;
+  }
+
+  async updateFaculty(id: string, faculty: Partial<InsertFaculty>): Promise<Faculty | undefined> {
+    const result = await db.update(schema.faculty).set(faculty).where(eq(schema.faculty.id, id)).returning();
+    return result[0];
+  }
+
+  async deleteFaculty(id: string): Promise<boolean> {
+    await db.delete(schema.faculty).where(eq(schema.faculty.id, id));
+    return true;
+  }
+
+  async updateStudent(id: string, student: Partial<InsertStudent>): Promise<Student | undefined> {
+    const result = await db.update(schema.students).set(student).where(eq(schema.students.id, id)).returning();
+    return result[0];
+  }
+
+  async deleteStudent(id: string): Promise<boolean> {
+    await db.delete(schema.students).where(eq(schema.students.id, id));
+    return true;
+  }
+
+  // TODO: Implement PostgresStorage methods for new entities (contact forms, timetable, academic calendar, admissions)
+  async getContactForms(): Promise<ContactForm[]> {
+    return await db.select().from(schema.contactForms);
+  }
+
+  async getContactForm(id: string): Promise<ContactForm | undefined> {
+    const result = await db.select().from(schema.contactForms).where(eq(schema.contactForms.id, id)).limit(1);
+    return result[0];
+  }
+
+  async createContactForm(form: InsertContactForm): Promise<ContactForm> {
+    const result = await db.insert(schema.contactForms).values(form).returning();
+    return result[0];
+  }
+
+  async updateContactFormStatus(id: string, status: string): Promise<ContactForm | undefined> {
+    const result = await db.update(schema.contactForms).set({ status }).where(eq(schema.contactForms.id, id)).returning();
+    return result[0];
+  }
+
+  async deleteContactForm(id: string): Promise<boolean> {
+    await db.delete(schema.contactForms).where(eq(schema.contactForms.id, id));
+    return true;
+  }
+
+  async getTimetables(filters?: { stream?: string; section?: string; year?: number }): Promise<Timetable[]> {
+    let query = db.select().from(schema.timetable).where(eq(schema.timetable.isActive, true));
+    return await query;
+  }
+
+  async getTimetable(id: string): Promise<Timetable | undefined> {
+    const result = await db.select().from(schema.timetable).where(eq(schema.timetable.id, id)).limit(1);
+    return result[0];
+  }
+
+  async createTimetable(timetable: InsertTimetable): Promise<Timetable> {
+    const result = await db.insert(schema.timetable).values(timetable).returning();
+    return result[0];
+  }
+
+  async updateTimetable(id: string, timetable: Partial<InsertTimetable>): Promise<Timetable | undefined> {
+    const result = await db.update(schema.timetable).set(timetable).where(eq(schema.timetable.id, id)).returning();
+    return result[0];
+  }
+
+  async deleteTimetable(id: string): Promise<boolean> {
+    await db.delete(schema.timetable).where(eq(schema.timetable.id, id));
+    return true;
+  }
+
+  async getAcademicCalendars(filters?: { academicYear?: string }): Promise<AcademicCalendar[]> {
+    let query = db.select().from(schema.academicCalendar).where(eq(schema.academicCalendar.isActive, true));
+    return await query;
+  }
+
+  async getAcademicCalendar(id: string): Promise<AcademicCalendar | undefined> {
+    const result = await db.select().from(schema.academicCalendar).where(eq(schema.academicCalendar.id, id)).limit(1);
+    return result[0];
+  }
+
+  async createAcademicCalendar(calendar: InsertAcademicCalendar): Promise<AcademicCalendar> {
+    const result = await db.insert(schema.academicCalendar).values(calendar).returning();
+    return result[0];
+  }
+
+  async updateAcademicCalendar(id: string, calendar: Partial<InsertAcademicCalendar>): Promise<AcademicCalendar | undefined> {
+    const result = await db.update(schema.academicCalendar).set(calendar).where(eq(schema.academicCalendar.id, id)).returning();
+    return result[0];
+  }
+
+  async deleteAcademicCalendar(id: string): Promise<boolean> {
+    await db.delete(schema.academicCalendar).where(eq(schema.academicCalendar.id, id));
+    return true;
+  }
+
+  async getAdmissions(): Promise<Admission[]> {
+    return await db.select().from(schema.admissions);
+  }
+
+  async getAdmission(id: string): Promise<Admission | undefined> {
+    const result = await db.select().from(schema.admissions).where(eq(schema.admissions.id, id)).limit(1);
+    return result[0];
+  }
+
+  async createAdmission(admission: InsertAdmission): Promise<Admission> {
+    const result = await db.insert(schema.admissions).values(admission).returning();
+    return result[0];
+  }
+
+  async updateAdmissionStatus(id: string, status: string, reviewedBy: string): Promise<Admission | undefined> {
+    const result = await db.update(schema.admissions)
+      .set({ status, reviewedBy, reviewedAt: new Date() })
+      .where(eq(schema.admissions.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async deleteAdmission(id: string): Promise<boolean> {
+    await db.delete(schema.admissions).where(eq(schema.admissions.id, id));
+    return true;
   }
 }
 
