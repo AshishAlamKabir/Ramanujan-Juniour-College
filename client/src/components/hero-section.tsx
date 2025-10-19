@@ -39,14 +39,13 @@ Request to parents/guardians : :
     <section className="hero-bg text-white relative overflow-hidden">
       {/* Campus background image with overlay */}
       <div className="absolute inset-0 bg-black/20"></div>
-      
       <div className="relative container mx-auto px-4 py-12">
         {/* Section 1: College Branding */}
         <div className="max-w-4xl mx-auto text-center mb-10">
-          <h1 className="text-4xl md:text-5xl font-bold mb-3 font-serif" data-testid="college-name">
+          <h1 className="md:text-5xl font-bold mb-3 font-serif text-[14px]" data-testid="college-name">
             Ramanujan Junior College
           </h1>
-          <p className="text-lg md:text-xl opacity-90" data-testid="vision-statement">
+          <p className="md:text-xl opacity-90 text-[12px]" data-testid="vision-statement">
             Education, Development and Progress
           </p>
         </div>
@@ -105,7 +104,6 @@ Request to parents/guardians : :
           </div>
         </div>
       </div>
-
       {/* Events Carousel Section */}
       <div className="relative">
         <EventsCarousel />
