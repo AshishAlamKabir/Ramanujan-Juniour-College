@@ -38,12 +38,19 @@ export default function Login() {
       return await res.json();
     },
     onSuccess: async (response: any) => {
-      queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
       toast({
         title: "Success",
         description: response.message || "Login successful",
       });
-      navigate("/dashboard");
+      
+      // Wait a bit for session to be fully saved
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // Invalidate queries after delay
+      await queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
+      
+      // Force a hard navigation instead of client-side routing
+      window.location.href = "/dashboard";
     },
     onError: (error: any) => {
       toast({
