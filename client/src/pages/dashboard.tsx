@@ -8,7 +8,7 @@ import { LogOut, User, UserCheck, UserX, Users, GraduationCap, Calendar, BookOpe
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import type { User as UserType, Faculty, Student, Event, Notice, GalleryImage, ContactForm, Timetable, AcademicCalendar, Admission, Payment } from "@shared/schema";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -20,6 +20,16 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Separator } from "@/components/ui/separator";
 import { format } from "date-fns";
 
+function RedirectToLogin() {
+  const [, navigate] = useLocation();
+  
+  useEffect(() => {
+    navigate("/login");
+  }, [navigate]);
+  
+  return null;
+}
+
 export default function Dashboard() {
   const [, navigate] = useLocation();
   const { toast } = useToast();
@@ -29,12 +39,12 @@ export default function Dashboard() {
   });
 
   const { data: studentDetails, isLoading: studentLoading } = useQuery<Student | null>({
-    queryKey: ["/api/students", user?.studentId],
+    queryKey: [`/api/students/${user?.studentId}`],
     enabled: !!user?.studentId,
   });
 
   const { data: facultyDetails, isLoading: facultyLoading } = useQuery<Faculty | null>({
-    queryKey: ["/api/faculty", user?.facultyId],
+    queryKey: [`/api/faculty/${user?.facultyId}`],
     enabled: !!user?.facultyId,
   });
 
@@ -76,8 +86,7 @@ export default function Dashboard() {
   }
 
   if (!user) {
-    navigate("/login");
-    return null;
+    return <RedirectToLogin />;
   }
 
   const handleLogout = async () => {

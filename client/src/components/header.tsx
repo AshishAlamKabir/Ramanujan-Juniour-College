@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
-import { Menu, X, ChevronDown, User, LogOut } from "lucide-react";
+import { Menu, X, ChevronDown, User, LogOut, GraduationCap, Briefcase, Shield, FileUser } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -141,36 +143,65 @@ export default function Header() {
             {isAuthenticated && user && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="gap-2" data-testid="nav-user-menu">
-                    <User className="h-4 w-4" />
-                    <span className="hidden xl:inline">{user.fullName}</span>
+                  <Button variant="outline" size="sm" className="gap-2 hover:bg-accent" data-testid="nav-user-menu">
+                    <Avatar className="h-7 w-7">
+                      <AvatarFallback className="bg-primary text-primary-foreground text-xs">
+                        {user.fullName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="hidden xl:flex flex-col items-start">
+                      <span className="text-sm font-medium leading-none">{user.fullName.split(' ')[0]}</span>
+                      <span className="text-xs text-muted-foreground">
+                        {user.role === "student" ? "Student" : user.role === "teacher" ? "Teacher" : "Management"}
+                      </span>
+                    </div>
+                    <ChevronDown className="h-4 w-4 opacity-50" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuContent align="end" className="w-64">
                   <DropdownMenuLabel>
-                    <div className="flex flex-col space-y-1">
-                      <p className="text-sm font-medium leading-none">{user.fullName}</p>
-                      <p className="text-xs leading-none text-muted-foreground">
-                        {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
-                      </p>
+                    <div className="flex items-center gap-3">
+                      <Avatar className="h-10 w-10">
+                        <AvatarFallback className="bg-primary text-primary-foreground">
+                          {user.fullName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex flex-col space-y-1">
+                        <p className="text-sm font-medium leading-none">{user.fullName}</p>
+                        <div className="flex items-center gap-1">
+                          {user.role === "student" && <GraduationCap className="h-3 w-3 text-blue-600" />}
+                          {user.role === "teacher" && <Briefcase className="h-3 w-3 text-green-600" />}
+                          {user.role === "management" && <Shield className="h-3 w-3 text-purple-600" />}
+                          <p className="text-xs leading-none text-muted-foreground capitalize">
+                            {user.role}
+                          </p>
+                        </div>
+                      </div>
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild>
-                    <Link href="/profile" className="cursor-pointer" data-testid="nav-profile">
-                      <User className="mr-2 h-4 w-4" />
-                      <span>Profile</span>
+                    <Link href="/dashboard" className="cursor-pointer" data-testid="nav-dashboard">
+                      <FileUser className="mr-2 h-4 w-4 text-primary" />
+                      <div className="flex flex-col">
+                        <span className="font-medium">Account Details</span>
+                        <span className="text-xs text-muted-foreground">
+                          View your {user.role === "student" ? "academic" : user.role === "teacher" ? "professional" : "account"} information
+                        </span>
+                      </div>
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link href="/dashboard" className="cursor-pointer" data-testid="nav-dashboard">
-                      <span>Dashboard</span>
+                    <Link href="/profile" className="cursor-pointer" data-testid="nav-profile">
+                      <User className="mr-2 h-4 w-4" />
+                      <span>Profile Settings</span>
                     </Link>
                   </DropdownMenuItem>
                   {user.role === "management" && (
                     <DropdownMenuItem asChild>
                       <Link href="/management" className="cursor-pointer" data-testid="nav-management">
-                        <span>Management</span>
+                        <Shield className="mr-2 h-4 w-4" />
+                        <span>Management Panel</span>
                       </Link>
                     </DropdownMenuItem>
                   )}
@@ -198,18 +229,44 @@ export default function Header() {
             <SheetContent side="right" className="w-[300px] sm:w-[400px]">
               <nav className="flex flex-col space-y-3 mt-6" data-testid="mobile-nav">
                 {isAuthenticated && user && (
-                  <div className="pb-3 mb-3 border-b">
-                    <p className="text-sm font-medium">{user.fullName}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
-                    </p>
-                    <div className="flex flex-col gap-2 mt-3">
+                  <div className="pb-4 mb-4 border-b">
+                    <div className="flex items-center gap-3 mb-3">
+                      <Avatar className="h-12 w-12">
+                        <AvatarFallback className="bg-primary text-primary-foreground text-sm">
+                          {user.fullName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <p className="text-sm font-medium">{user.fullName}</p>
+                        <div className="flex items-center gap-1 mt-0.5">
+                          {user.role === "student" && <GraduationCap className="h-3 w-3 text-blue-600" />}
+                          {user.role === "teacher" && <Briefcase className="h-3 w-3 text-green-600" />}
+                          {user.role === "management" && <Shield className="h-3 w-3 text-purple-600" />}
+                          <p className="text-xs text-muted-foreground capitalize">
+                            {user.role}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex flex-col gap-2">
+                      <Link href="/dashboard">
+                        <Button
+                          variant="default"
+                          size="sm"
+                          className="w-full gap-2"
+                          onClick={() => setTimeout(() => setIsOpen(false), 100)}
+                          data-testid="mobile-nav-dashboard"
+                        >
+                          <FileUser className="h-4 w-4" />
+                          Account Details
+                        </Button>
+                      </Link>
                       <div className="flex gap-2">
-                        <Link href="/profile">
+                        <Link href="/profile" className="flex-1">
                           <Button
                             variant="outline"
                             size="sm"
-                            className="gap-2"
+                            className="w-full gap-2"
                             onClick={() => setTimeout(() => setIsOpen(false), 100)}
                             data-testid="mobile-nav-profile"
                           >
@@ -234,13 +291,14 @@ export default function Header() {
                       {user.role === "management" && (
                         <Link href="/management">
                           <Button
-                            variant="default"
+                            variant="outline"
                             size="sm"
                             className="w-full gap-2"
                             onClick={() => setTimeout(() => setIsOpen(false), 100)}
                             data-testid="mobile-nav-management"
                           >
-                            Management
+                            <Shield className="h-4 w-4" />
+                            Management Panel
                           </Button>
                         </Link>
                       )}
