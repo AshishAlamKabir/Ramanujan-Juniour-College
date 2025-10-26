@@ -1,0 +1,131 @@
+Admin Full Workflow – Website Management and Operational Controls
+
+Objective:
+Develop an Admin Portal that enables the administrator to seamlessly execute institutional management operations — including student approval, fee management, timetable scheduling, notice updates, and website content synchronization — all accessible post-login within a unified dashboard.
+
+Prompt Script:
+
+“After successful authentication as an Admin, redirect to the Admin Control Dashboard.
+The Admin panel should serve as the nerve center for all operational and website management workflows.
+
+Functional Requirements:
+
+Student Approval System:
+
+Display a table of pending student registration requests.
+
+Options: Approve, Reject, or Hold.
+
+Update database status instantly upon action.
+
+Auto-refresh the view post-action with a toast notification (‘Student approved successfully’).
+
+Fee Structure Management:
+
+Provide editable form fields for fee categories (Tuition, Lab, Hostel, Transport).
+
+Enable CRUD operations on fee data.
+
+Display current fee structure with last modified timestamp.
+
+Save all updates via backend API /api/admin/update-fee.
+
+Timetable Management:
+
+Upload or edit the timetable (support PDF or Excel formats).
+
+Display current timetable in preview mode.
+
+Option to push updates to the website so students and teachers see real-time changes.
+
+Notice Board Management:
+
+Enable creating, editing, and deleting notices.
+
+Fields: Title, Description, Date, Author, and Attachment (optional).
+
+Publish to frontend via API endpoint /api/admin/notice.
+
+Include search and filter options for past notices.
+
+Website Management & PDF Uploads:
+
+Provide a section to upload PDFs, circulars, academic reports, and event announcements.
+
+Integrate file storage (e.g., Firebase Storage or local /uploads directory).
+
+Automatically reflect uploads on the main website’s “Resources” or “Downloads” page.
+
+Visibility & Real-Time Updates:
+
+Implement live synchronization so website updates (fee structure, notices, timetable) are reflected in real time.
+
+Utilize WebSocket, Firebase Realtime DB, or polling every 60 seconds for update checks.
+
+Show status indicators (e.g., “Last website update: 2 mins ago”).
+
+User Experience & Design Guidelines:
+
+Dashboard Layout:
+
+Left Panel: Navigation Menu (Dashboard | Students | Fees | Timetable | Notices | Uploads | Settings)
+
+Main Panel: Dynamic module workspace.
+
+Right Panel: Notifications, logs, and quick actions.
+
+Include status badges and modals for confirmation prompts.
+
+Use icons and cards for quick navigation.
+
+Backend Requirements:
+
+Endpoints:
+
+/api/admin/students (GET, PUT, DELETE)
+
+/api/admin/fee-structure (GET, POST, PUT)
+
+/api/admin/timetable (GET, POST, PUT)
+
+/api/admin/notice-board (GET, POST, DELETE)
+
+/api/admin/uploads (POST, GET)
+
+Implement JWT-based admin authentication middleware.
+
+Maintain activity logs for audit trail (who updated what and when).
+
+Ensure all data updates trigger a broadcast refresh event.
+
+Performance Enhancements:
+
+Cache notices and timetables for fast retrieval.
+
+Implement pagination for student and notice lists.
+
+Integrate server logs and analytics later for performance insights.”
+
+Expected Deliverables:
+
+Routes: /admin-dashboard, /admin/students, /admin/fee, /admin/notice, /admin/uploads.
+
+Core Components:
+
+StudentApproval.jsx
+
+FeeManager.jsx
+
+TimetableManager.jsx
+
+NoticeBoardAdmin.jsx
+
+FileUploadManager.jsx
+
+Backend Modules:
+
+adminRoutes.js / adminController.py
+
+Secure CRUD APIs with proper response handling.
+
+Live Update Sync: via WebSocket or scheduled backend cron job.

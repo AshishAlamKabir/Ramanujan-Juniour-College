@@ -57,15 +57,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use(
     session({
       secret: process.env.SESSION_SECRET || "ramanujan-college-secret-key-2024",
-      resave: false,
-      saveUninitialized: false,
+      resave: true, // Force session save on each request
+      saveUninitialized: true, // Create session even if not modified
       store: new MemoryStoreSession({
         checkPeriod: 86400000, // 24 hours
       }),
       cookie: {
         maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
+        httpOnly: false, // Allow JavaScript access for debugging
+        secure: false, // Disable in development
         sameSite: "lax", // Better compatibility while maintaining security
       },
     })
