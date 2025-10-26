@@ -19,8 +19,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Calendar, Plus, Edit, Trash2, Image, FileText, Users, Bell, Loader2 } from "lucide-react";
-import type { Event, Notice, GalleryImage, Admission } from "@shared/schema";
+import { Calendar, Plus, Edit, Trash2, Image, FileText, Users, Bell, Loader2, GraduationCap, UserCog } from "lucide-react";
+import type { Event, Notice, GalleryImage, Admission, Faculty, Student, Department } from "@shared/schema";
 
 const eventSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -46,9 +46,26 @@ const galleryImageSchema = z.object({
   isActive: z.boolean().default(true),
 });
 
+const teacherSchema = z.object({
+  designation: z.string().min(1, "Designation is required"),
+  departmentId: z.string().optional().nullable(),
+  email: z.string().email("Invalid email").optional().or(z.literal("")),
+  phone: z.string().optional().or(z.literal("")),
+});
+
+const studentSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  stream: z.string().min(1, "Stream is required"),
+  year: z.number().min(1).max(2),
+  section: z.string().min(1, "Section is required"),
+  status: z.string().min(1, "Status is required"),
+});
+
 type EventForm = z.infer<typeof eventSchema>;
 type NoticeForm = z.infer<typeof noticeSchema>;
 type GalleryImageForm = z.infer<typeof galleryImageSchema>;
+type TeacherForm = z.infer<typeof teacherSchema>;
+type StudentForm = z.infer<typeof studentSchema>;
 
 export default function Management() {
   const { user, isLoading: authLoading } = useAuth();
@@ -57,14 +74,10 @@ export default function Management() {
   const queryClient = useQueryClient();
   const [editingEvent, setEditingEvent] = useState<Event | null>(null);
   const [editingNotice, setEditingNotice] = useState<Notice | null>(null);
+  const [editingTeacher, setEditingTeacher] = useState<Faculty | null>(null);
+  const [editingStudent, setEditingStudent] = useState<Student | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
-  const [deleteType, setDeleteType] = useState<"event" | "notice" | "gallery" | "admission" | null>(null);
-
-  // Redirect non-management users
-  if (!authLoading && (!user || user.role !== "management")) {
-    navigate("/");
-    return null;
-  }
+  const [deleteType, setDeleteType] = useState<"event" | "notice" | "gallery" | "admission" | "teacher" | "student" | null>(null);
 
   if (authLoading) {
     return (
@@ -72,6 +85,12 @@ export default function Management() {
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
+  }
+
+  // Redirect non-management users
+  if (!user || user.role !== "management") {
+    navigate("/");
+    return null;
   }
 
   return (
@@ -91,8 +110,16 @@ export default function Management() {
           </p>
         </div>
 
-        <Tabs defaultValue="events" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
+        <Tabs defaultValue="teachers" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-6">
+            <TabsTrigger value="teachers" className="gap-2" data-testid="tab-teachers">
+              <UserCog className="h-4 w-4" />
+              Teachers
+            </TabsTrigger>
+            <TabsTrigger value="students" className="gap-2" data-testid="tab-students">
+              <GraduationCap className="h-4 w-4" />
+              Students
+            </TabsTrigger>
             <TabsTrigger value="events" className="gap-2" data-testid="tab-events">
               <Calendar className="h-4 w-4" />
               Events
@@ -110,6 +137,28 @@ export default function Management() {
               Admissions
             </TabsTrigger>
           </TabsList>
+
+          <TabsContent value="teachers">
+            <TeachersManagement
+              editingTeacher={editingTeacher}
+              setEditingTeacher={setEditingTeacher}
+              onDelete={(id) => {
+                setDeleteId(id);
+                setDeleteType("teacher");
+              }}
+            />
+          </TabsContent>
+
+          <TabsContent value="students">
+            <StudentsManagement
+              editingStudent={editingStudent}
+              setEditingStudent={setEditingStudent}
+              onDelete={(id) => {
+                setDeleteId(id);
+                setDeleteType("student");
+              }}
+            />
+          </TabsContent>
 
           <TabsContent value="events">
             <EventsManagement
@@ -171,12 +220,23 @@ export default function Management() {
     </>
   );
 
-  function handleDelete(id: string, type: "event" | "notice" | "gallery" | "admission") {
+  function handleDelete(id: string, type: "event" | "notice" | "gallery" | "admission" | "teacher" | "student") {
     const endpoints = {
       event: `/api/events/${id}`,
       notice: `/api/notices/${id}`,
       gallery: `/api/gallery/${id}`,
       admission: `/api/admissions/${id}`,
+      teacher: `/api/faculty/${id}`,
+      student: `/api/students/${id}`,
+    };
+
+    const queryKeys = {
+      event: ["/api/events"],
+      notice: ["/api/notices"],
+      gallery: ["/api/gallery"],
+      admission: ["/api/admissions"],
+      teacher: ["/api/faculty"],
+      student: ["/api/students"],
     };
 
     apiRequest("DELETE", endpoints[type])
@@ -185,7 +245,7 @@ export default function Management() {
           title: "Success",
           description: `${type.charAt(0).toUpperCase() + type.slice(1)} deleted successfully`,
         });
-        queryClient.invalidateQueries({ queryKey: [`/api/${type}s`] });
+        queryClient.invalidateQueries({ queryKey: queryKeys[type] });
         setDeleteId(null);
         setDeleteType(null);
       })
@@ -1076,7 +1136,7 @@ function DeleteConfirmDialog({
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onConfirm: () => void;
-  type: "event" | "notice" | "gallery" | "admission";
+  type: "event" | "notice" | "gallery" | "admission" | "teacher" | "student";
 }) {
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
@@ -1095,5 +1155,544 @@ function DeleteConfirmDialog({
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
+  );
+}
+
+function TeachersManagement({
+  editingTeacher,
+  setEditingTeacher,
+  onDelete,
+}: {
+  editingTeacher: Faculty | null;
+  setEditingTeacher: (teacher: Faculty | null) => void;
+  onDelete: (id: string) => void;
+}) {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  const { data: teachers = [], isLoading } = useQuery<Faculty[]>({
+    queryKey: ["/api/faculty"],
+  });
+
+  const { data: departments = [] } = useQuery<Department[]>({
+    queryKey: ["/api/departments"],
+  });
+
+  const form = useForm<TeacherForm>({
+    resolver: zodResolver(teacherSchema),
+    defaultValues: editingTeacher
+      ? {
+          designation: editingTeacher.designation,
+          departmentId: editingTeacher.departmentId || "",
+          email: editingTeacher.email || "",
+          phone: editingTeacher.phone || "",
+        }
+      : {
+          designation: "",
+          departmentId: "",
+          email: "",
+          phone: "",
+        },
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: async (data: TeacherForm) => {
+      const res = await apiRequest("PATCH", `/api/faculty/${editingTeacher?.id}`, data);
+      return res.json();
+    },
+    onSuccess: () => {
+      toast({ title: "Success", description: "Teacher updated successfully" });
+      queryClient.invalidateQueries({ queryKey: ["/api/faculty"] });
+      setEditingTeacher(null);
+      form.reset();
+    },
+    onError: (error: any) => {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    },
+  });
+
+  const onSubmit = (data: TeacherForm) => {
+    if (editingTeacher) {
+      updateMutation.mutate(data);
+    }
+  };
+
+  return (
+    <div className="grid gap-6">
+      {editingTeacher && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Edit className="h-5 w-5" />
+              Edit Teacher
+            </CardTitle>
+            <CardDescription>Update teacher details</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <FormField
+                    control={form.control}
+                    name="designation"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Designation *</FormLabel>
+                        <FormControl>
+                          <Input {...field} placeholder="Associate Professor" data-testid="input-teacher-designation" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="departmentId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Department</FormLabel>
+                        <Select onValueChange={field.onChange} value={field.value || ""}>
+                          <FormControl>
+                            <SelectTrigger data-testid="select-teacher-department">
+                              <SelectValue placeholder="Select department" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="">None</SelectItem>
+                            {departments.map((dept) => (
+                              <SelectItem key={dept.id} value={dept.id}>
+                                {dept.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Email</FormLabel>
+                        <FormControl>
+                          <Input {...field} type="email" placeholder="teacher@example.com" data-testid="input-teacher-email" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="phone"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Phone</FormLabel>
+                        <FormControl>
+                          <Input {...field} placeholder="1234567890" data-testid="input-teacher-phone" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <div className="flex gap-3">
+                  <Button
+                    type="submit"
+                    disabled={updateMutation.isPending}
+                    data-testid="button-save-teacher"
+                  >
+                    {updateMutation.isPending ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Updating...
+                      </>
+                    ) : (
+                      "Update Teacher"
+                    )}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => {
+                      setEditingTeacher(null);
+                      form.reset();
+                    }}
+                    data-testid="button-cancel-teacher"
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              </form>
+            </Form>
+          </CardContent>
+        </Card>
+      )}
+
+      <Card>
+        <CardHeader>
+          <CardTitle>All Teachers</CardTitle>
+          <CardDescription>Manage existing teachers</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {isLoading ? (
+            <div className="flex justify-center py-8">
+              <Loader2 className="h-6 w-6 animate-spin" />
+            </div>
+          ) : teachers.length === 0 ? (
+            <p className="text-center text-muted-foreground py-8">No teachers found</p>
+          ) : (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Designation</TableHead>
+                    <TableHead>Department</TableHead>
+                    <TableHead>Email</TableHead>
+                    <TableHead>Phone</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {teachers.map((teacher) => (
+                    <TableRow key={teacher.id}>
+                      <TableCell className="font-medium">{teacher.name}</TableCell>
+                      <TableCell>{teacher.designation}</TableCell>
+                      <TableCell>
+                        {departments.find((d) => d.id === teacher.departmentId)?.name || "N/A"}
+                      </TableCell>
+                      <TableCell>{teacher.email || "N/A"}</TableCell>
+                      <TableCell>{teacher.phone || "N/A"}</TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex gap-2 justify-end">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              setEditingTeacher(teacher);
+                              form.reset({
+                                designation: teacher.designation,
+                                departmentId: teacher.departmentId || "",
+                                email: teacher.email || "",
+                                phone: teacher.phone || "",
+                              });
+                            }}
+                            data-testid={`button-edit-teacher-${teacher.id}`}
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            onClick={() => onDelete(teacher.id)}
+                            data-testid={`button-delete-teacher-${teacher.id}`}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+function StudentsManagement({
+  editingStudent,
+  setEditingStudent,
+  onDelete,
+}: {
+  editingStudent: Student | null;
+  setEditingStudent: (student: Student | null) => void;
+  onDelete: (id: string) => void;
+}) {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  const { data: students = [], isLoading } = useQuery<Student[]>({
+    queryKey: ["/api/students"],
+  });
+
+  const form = useForm<StudentForm>({
+    resolver: zodResolver(studentSchema),
+    defaultValues: editingStudent
+      ? {
+          name: editingStudent.name,
+          stream: editingStudent.stream,
+          year: editingStudent.year,
+          section: editingStudent.section,
+          status: editingStudent.status,
+        }
+      : {
+          name: "",
+          stream: "",
+          year: 1,
+          section: "",
+          status: "",
+        },
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: async (data: StudentForm) => {
+      const res = await apiRequest("PATCH", `/api/students/${editingStudent?.id}`, data);
+      return res.json();
+    },
+    onSuccess: () => {
+      toast({ title: "Success", description: "Student updated successfully" });
+      queryClient.invalidateQueries({ queryKey: ["/api/students"] });
+      setEditingStudent(null);
+      form.reset();
+    },
+    onError: (error: any) => {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    },
+  });
+
+  const onSubmit = (data: StudentForm) => {
+    if (editingStudent) {
+      updateMutation.mutate(data);
+    }
+  };
+
+  return (
+    <div className="grid gap-6">
+      {editingStudent && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Edit className="h-5 w-5" />
+              Edit Student
+            </CardTitle>
+            <CardDescription>Update student details</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Name *</FormLabel>
+                      <FormControl>
+                        <Input {...field} placeholder="Student Name" data-testid="input-student-name" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <FormField
+                    control={form.control}
+                    name="stream"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Stream *</FormLabel>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <FormControl>
+                            <SelectTrigger data-testid="select-student-stream">
+                              <SelectValue placeholder="Select stream" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="Science">Science</SelectItem>
+                            <SelectItem value="Arts">Arts</SelectItem>
+                            <SelectItem value="Commerce">Commerce</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="year"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Year *</FormLabel>
+                        <Select onValueChange={(value) => field.onChange(Number(value))} value={field.value.toString()}>
+                          <FormControl>
+                            <SelectTrigger data-testid="select-student-year">
+                              <SelectValue placeholder="Select year" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="1">1st Year</SelectItem>
+                            <SelectItem value="2">2nd Year</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <FormField
+                    control={form.control}
+                    name="section"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Section *</FormLabel>
+                        <FormControl>
+                          <Input {...field} placeholder="A" data-testid="input-student-section" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="status"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Status *</FormLabel>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <FormControl>
+                            <SelectTrigger data-testid="select-student-status">
+                              <SelectValue placeholder="Select status" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="current">Current</SelectItem>
+                            <SelectItem value="graduated">Graduated</SelectItem>
+                            <SelectItem value="suspended">Suspended</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <div className="flex gap-3">
+                  <Button
+                    type="submit"
+                    disabled={updateMutation.isPending}
+                    data-testid="button-save-student"
+                  >
+                    {updateMutation.isPending ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Updating...
+                      </>
+                    ) : (
+                      "Update Student"
+                    )}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => {
+                      setEditingStudent(null);
+                      form.reset();
+                    }}
+                    data-testid="button-cancel-student"
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              </form>
+            </Form>
+          </CardContent>
+        </Card>
+      )}
+
+      <Card>
+        <CardHeader>
+          <CardTitle>All Students</CardTitle>
+          <CardDescription>Manage existing students</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {isLoading ? (
+            <div className="flex justify-center py-8">
+              <Loader2 className="h-6 w-6 animate-spin" />
+            </div>
+          ) : students.length === 0 ? (
+            <p className="text-center text-muted-foreground py-8">No students found</p>
+          ) : (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Student ID</TableHead>
+                    <TableHead>Stream</TableHead>
+                    <TableHead>Year</TableHead>
+                    <TableHead>Section</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {students.map((student) => (
+                    <TableRow key={student.id}>
+                      <TableCell className="font-medium">{student.name}</TableCell>
+                      <TableCell>{student.studentId}</TableCell>
+                      <TableCell>
+                        <Badge variant="outline">{student.stream}</Badge>
+                      </TableCell>
+                      <TableCell>{student.year}</TableCell>
+                      <TableCell>{student.section}</TableCell>
+                      <TableCell>
+                        <Badge variant={student.status === "current" ? "default" : "secondary"}>
+                          {student.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex gap-2 justify-end">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              setEditingStudent(student);
+                              form.reset({
+                                name: student.name,
+                                stream: student.stream,
+                                year: student.year,
+                                section: student.section,
+                                status: student.status,
+                              });
+                            }}
+                            data-testid={`button-edit-student-${student.id}`}
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            onClick={() => onDelete(student.id)}
+                            data-testid={`button-delete-student-${student.id}`}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
   );
 }
