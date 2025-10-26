@@ -4,72 +4,95 @@ import { storage } from "./storage";
 import { registerUserSchema, loginUserSchema, insertNoticeSchema, insertEventSchema, insertNewsSchema, insertDepartmentSchema, insertCourseSchema, insertFacultySchema, insertFacilitySchema, insertGalleryImageSchema, insertStudentSchema, insertTeacherRatingSchema, insertRatingLinkSchema, insertStudentDueSchema, insertPaymentSchema, insertContactFormSchema, insertTimetableSchema, insertAcademicCalendarSchema, insertAdmissionSchema, type User } from "@shared/schema";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
-import session from "express-session";
-import MemoryStore from "memorystore";
+import jwt from "jsonwebtoken";
 
-const MemoryStoreSession = MemoryStore(session);
+const JWT_SECRET = process.env.JWT_SECRET;
 
-// Extend Express Request to include session user
-declare module 'express-session' {
-  interface SessionData {
-    userId?: string;
+if (!JWT_SECRET) {
+  throw new Error("JWT_SECRET environment variable is required. Please set it in your environment.");
+}
+
+// Extend Express Request to include authenticated user
+declare global {
+  namespace Express {
+    interface Request {
+      user?: User;
+      userId?: string;
+    }
   }
+}
+
+// Helper function to generate JWT token
+function generateToken(userId: string): string {
+  return jwt.sign({ userId }, JWT_SECRET, { expiresIn: "7d" });
 }
 
 // Authentication middleware
 function requireAuth(req: Request, res: Response, next: NextFunction) {
-  if (!req.session.userId) {
-    return res.status(401).json({ message: "Authentication required" });
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ message: "Authentication required" });
+    }
+    
+    const token = authHeader.substring(7);
+    const decoded = jwt.verify(token, JWT_SECRET) as { userId: string };
+    req.userId = decoded.userId;
+    next();
+  } catch (error) {
+    return res.status(401).json({ message: "Invalid or expired token" });
   }
-  next();
 }
 
 function requireRole(...roles: string[]) {
   return async (req: Request, res: Response, next: NextFunction) => {
-    if (!req.session.userId) {
-      return res.status(401).json({ message: "Authentication required" });
+    try {
+      const authHeader = req.headers.authorization;
+      if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return res.status(401).json({ message: "Authentication required" });
+      }
+      
+      const token = authHeader.substring(7);
+      const decoded = jwt.verify(token, JWT_SECRET) as { userId: string };
+      const user = await storage.getUser(decoded.userId);
+      
+      if (!user || !roles.includes(user.role)) {
+        return res.status(403).json({ message: "Insufficient permissions" });
+      }
+      
+      req.userId = decoded.userId;
+      req.user = user;
+      next();
+    } catch (error) {
+      return res.status(401).json({ message: "Invalid or expired token" });
     }
-    
-    const user = await storage.getUser(req.session.userId);
-    if (!user || !roles.includes(user.role)) {
-      return res.status(403).json({ message: "Insufficient permissions" });
-    }
-    
-    next();
   };
 }
 
 async function requireApproved(req: Request, res: Response, next: NextFunction) {
-  if (!req.session.userId) {
-    return res.status(401).json({ message: "Authentication required" });
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ message: "Authentication required" });
+    }
+    
+    const token = authHeader.substring(7);
+    const decoded = jwt.verify(token, JWT_SECRET) as { userId: string };
+    const user = await storage.getUser(decoded.userId);
+    
+    if (!user || user.approvalStatus !== "approved") {
+      return res.status(403).json({ message: "Account not yet approved" });
+    }
+    
+    req.userId = decoded.userId;
+    req.user = user;
+    next();
+  } catch (error) {
+    return res.status(401).json({ message: "Invalid or expired token" });
   }
-  
-  const user = await storage.getUser(req.session.userId);
-  if (!user || user.approvalStatus !== "approved") {
-    return res.status(403).json({ message: "Account not yet approved" });
-  }
-  
-  next();
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Session middleware
-  app.use(
-    session({
-      secret: process.env.SESSION_SECRET || "ramanujan-college-secret-key-2024",
-      resave: true, // Force session save on each request
-      saveUninitialized: true, // Create session even if not modified
-      store: new MemoryStoreSession({
-        checkPeriod: 86400000, // 24 hours
-      }),
-      cookie: {
-        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-        httpOnly: false, // Allow JavaScript access for debugging
-        secure: false, // Disable in development
-        sameSite: "lax", // Better compatibility while maintaining security
-      },
-    })
-  );
 
   // Authentication routes
   app.post("/api/auth/register", async (req, res) => {
@@ -204,21 +227,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Account not yet approved. Please wait for management approval." });
       }
       
-      // Set session and save explicitly
-      req.session.userId = user.id;
-      
-      // Save session before responding
-      await new Promise<void>((resolve, reject) => {
-        req.session.save((err) => {
-          if (err) reject(err);
-          else resolve();
-        });
-      });
+      // Generate JWT token
+      const token = generateToken(user.id);
       
       // Remove password from response
       const { password, ...userWithoutPassword } = user;
       
-      res.json({ message: "Login successful", user: userWithoutPassword });
+      res.json({ message: "Login successful", user: userWithoutPassword, token });
     } catch (error) {
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: "Invalid data", errors: error.errors });
@@ -227,18 +242,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/auth/logout", requireAuth, (req, res) => {
-    req.session.destroy((err) => {
-      if (err) {
-        return res.status(500).json({ message: "Failed to logout" });
-      }
-      res.json({ message: "Logout successful" });
-    });
+  app.post("/api/auth/logout", (req, res) => {
+    // With JWT, logout is handled client-side by removing the token
+    // This endpoint is idempotent and doesn't require authentication
+    res.json({ message: "Logout successful" });
   });
 
   app.get("/api/auth/me", requireAuth, async (req, res) => {
     try {
-      const user = await storage.getUser(req.session.userId!);
+      const user = await storage.getUser(req.userId!);
       
       if (!user) {
         return res.status(404).json({ message: "User not found" });
@@ -827,7 +839,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const validatedData = insertRatingLinkSchema.parse(req.body);
       
-      if (!req.session.userId) {
+      if (!req.userId) {
         return res.status(401).json({ message: "Authentication required" });
       }
       
@@ -836,7 +848,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const link = await storage.createRatingLink({
         ...validatedData,
         linkToken: token,
-        createdBy: req.session.userId
+        createdBy: req.userId
       });
       
       res.status(201).json(link);
@@ -936,11 +948,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/payments/:id/verify", requireRole("management", "admin", "principal"), async (req, res) => {
     try {
-      if (!req.session.userId) {
+      if (!req.userId) {
         return res.status(401).json({ message: "Authentication required" });
       }
       
-      const payment = await storage.verifyPayment(req.params.id, req.session.userId);
+      const payment = await storage.verifyPayment(req.params.id, req.userId);
       
       if (!payment) {
         return res.status(404).json({ message: "Payment not found" });
@@ -1198,12 +1210,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.patch("/api/admissions/:id/status", requireRole("management", "admin"), async (req, res) => {
     try {
-      if (!req.session.userId) {
+      if (!req.userId) {
         return res.status(401).json({ message: "Authentication required" });
       }
       
       const { status } = req.body;
-      const admission = await storage.updateAdmissionStatus(req.params.id, status, req.session.userId);
+      const admission = await storage.updateAdmissionStatus(req.params.id, status, req.userId);
       if (!admission) {
         return res.status(404).json({ message: "Admission not found" });
       }

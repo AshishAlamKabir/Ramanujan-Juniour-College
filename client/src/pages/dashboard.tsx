@@ -91,10 +91,13 @@ export default function Dashboard() {
 
   const handleLogout = async () => {
     try {
-      await fetch("/api/auth/logout", {
-        method: "POST",
-        credentials: "include",
-      });
+      // Remove JWT token from localStorage
+      localStorage.removeItem("authToken");
+      
+      // Clear queries
+      queryClient.clear();
+      
+      // Navigate to login
       navigate("/login");
     } catch (error) {
       console.error("Logout failed:", error);

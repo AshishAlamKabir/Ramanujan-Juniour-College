@@ -38,18 +38,20 @@ export default function Login() {
       return await res.json();
     },
     onSuccess: async (response: any) => {
+      // Store JWT token in localStorage
+      if (response.token) {
+        localStorage.setItem("authToken", response.token);
+      }
+      
       toast({
         title: "Success",
         description: response.message || "Login successful",
       });
       
-      // Wait a bit for session to be fully saved
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      // Invalidate queries after delay
+      // Invalidate queries
       await queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
       
-      // Force a hard navigation instead of client-side routing
+      // Navigate to dashboard
       window.location.href = "/dashboard";
     },
     onError: (error: any) => {

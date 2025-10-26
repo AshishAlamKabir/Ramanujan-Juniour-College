@@ -28,7 +28,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const response = await apiRequest("POST", "/api/auth/login", credentials);
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (data: any) => {
+      // Store JWT token
+      if (data.token) {
+        localStorage.setItem("authToken", data.token);
+      }
       queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
     },
   });
@@ -42,11 +46,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logoutMutation = useMutation({
     mutationFn: async () => {
-      await apiRequest("POST", "/api/auth/logout");
+      // Remove JWT token
+      localStorage.removeItem("authToken");
     },
     onSuccess: () => {
       queryClient.setQueryData(["/api/auth/me"], null);
-      queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
+      queryClient.clear();
     },
   });
 
