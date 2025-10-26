@@ -2,13 +2,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Megaphone, Calendar, Link as LinkIcon, ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
-import { Link, useLocation } from "wouter";
+import { Link } from "wouter";
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { formatDistanceToNow } from "date-fns";
 import type { Notice, Event } from "@shared/schema";
 import principalImage from "@assets/image_1760023930701.png";
-import collegeLogo from "@assets/Screenshot 2025-10-12 163912_1760267377713.png";
 
 import image1 from "@assets/Screenshot 2025-10-02 162408_1759402604596.png";
 import image2 from "@assets/Screenshot 2025-10-02 162348_1759402604596.png";
@@ -31,7 +30,6 @@ const collegeImages = [
 ];
 
 export default function Home() {
-  const [location] = useLocation();
   const [showFullMessage, setShowFullMessage] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -66,62 +64,14 @@ export default function Home() {
 
   const previewMessage = `This prospectus is intended to give all the necessary information about our system of imparting excellent education to the sincere and devoted students wishing for a successful career and shine in today's competitive world...`;
 
-  const navigation = [
-    { name: "Home", href: "/" },
-    { name: "About", href: "/about" },
-    { name: "Academics", href: "/academics" },
-    { name: "Admissions", href: "/admissions" },
-    { name: "Students", href: "/students" },
-    { name: "Contact", href: "/contact" },
-    { name: "Login/Signup", href: "/login" },
-  ];
-
   return (
     <div className="min-h-screen bg-background">
-      {/* Mobile Header - Only visible on mobile */}
-      <div className="lg:hidden bg-white border-b sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-3">
-          <div className="flex items-center justify-between">
-            <Link href="/">
-              <div className="flex items-center gap-2">
-                <img 
-                  src={collegeLogo} 
-                  alt="Ramanujan Junior College Logo" 
-                  className="w-12 h-12 object-contain"
-                />
-                <div className="leading-tight">
-                  <h1 className="text-base font-bold">Ramanujan Junior College</h1>
-                  <p className="text-xs text-muted-foreground">Assam (AHSEC)</p>
-                </div>
-              </div>
-            </Link>
-          </div>
-        </div>
-      </div>
-
       {/* Hero Section with Blue Background */}
       <section className="hero-bg text-white relative overflow-hidden">
         <div className="absolute inset-0 bg-black/20"></div>
         <div className="relative">
-          {/* Desktop Logo - Only visible on desktop */}
-          <div className="hidden lg:block container mx-auto px-4 pt-4">
-            <Link href="/">
-              <div className="flex items-center gap-2">
-                <img 
-                  src={collegeLogo} 
-                  alt="Ramanujan Junior College Logo" 
-                  className="w-12 h-12 object-contain"
-                />
-                <div className="leading-tight">
-                  <h1 className="text-base font-bold">Ramanujan Junior College</h1>
-                  <p className="text-xs opacity-90">Assam (AHSEC)</p>
-                </div>
-              </div>
-            </Link>
-          </div>
-
           {/* Hero Content */}
-          <div className="container mx-auto px-4 py-8 text-center">
+          <div className="container mx-auto px-4 py-12 text-center">
             <h2 className="text-3xl md:text-5xl font-bold mb-2 font-serif" data-testid="college-name">
               Ramanujan Junior College
             </h2>
@@ -131,30 +81,6 @@ export default function Home() {
             <p className="text-sm md:text-base opacity-80" data-testid="establishment-year">
               Established in 2004
             </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Navigation Pills */}
-      <section className="bg-primary py-3 sticky top-0 lg:top-auto z-40">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-wrap justify-center gap-2">
-            {navigation.map((item) => (
-              <Link key={item.name} href={item.href}>
-                <Button
-                  variant={location === item.href ? "secondary" : "ghost"}
-                  size="sm"
-                  className={`rounded-full px-4 ${
-                    location === item.href
-                      ? "bg-white text-primary hover:bg-white"
-                      : "text-white hover:bg-white/20"
-                  }`}
-                  data-testid={`nav-pill-${item.name.toLowerCase().replace(/\//g, '-')}`}
-                >
-                  {item.name}
-                </Button>
-              </Link>
-            ))}
           </div>
         </div>
       </section>

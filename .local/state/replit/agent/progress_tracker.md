@@ -98,7 +98,7 @@
   - Controller of Examination (Mr. Parag Borah) - PB initials
   - Co-ordinator Entrance Base Test (Mr. Parag Borah) - PB initials
   - Joint Co-ordinator (Mr. Parag Paran Saikia) - PPS initials
-  - Career Counsellor (Mr. Ankush Kahar) - AK initials
+  - Career Counsellour (Mr. Ankush Kahar) - AK initials
 [x] Styled avatars with 80x80 size and colored borders (primary/accent)
 [x] Used professional initials as fallback display
 [x] Reorganized card layout with flexbox for better visual hierarchy
@@ -138,16 +138,13 @@
 
 ## Home Page Redesign - October 26, 2025 ✓
 [x] Transformed home page to match new design format
-[x] Moved navigation below hero section as pill-style buttons
+[x] **RESTORED ORIGINAL HEADER** - Full navigation with logo and dropdown menus
 [x] Created two-column layout: Principal's Desk + Achievements carousel
 [x] Added three-card section: Notice Board (blue), Ongoing Events (yellow), Quick Links
-[x] Updated header to simplify navigation (user menu only on desktop)
-[x] Implemented mobile-responsive design maintaining same format
-[x] Added floating hamburger menu button for mobile devices
-[x] Hero section displays college logo, name, tagline, and establishment year
-[x] Navigation pills change style on active page (white background)
+[x] Blue hero section displays college name, tagline, and establishment year
 [x] Principal's Desk card with photo, message, and "SHOW MORE" button
 [x] College Achievements carousel with navigation arrows and dots
 [x] All three cards display proper content with appropriate headers
-[x] Design matches reference image format exactly
+[x] Design combines new layout with original header functionality
+[x] Mobile responsive design maintained
 [x] Verified all features working with screenshot
