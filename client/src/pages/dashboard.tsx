@@ -1,10 +1,10 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Helmet } from "react-helmet-async";
 import { useLocation } from "wouter";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { LogOut, User, UserCheck, UserX, Users, GraduationCap, Calendar, BookOpen, Image, Mail, ClipboardList, DollarSign, FileText, Clock } from "lucide-react";
+import { LogOut, User, UserCheck, UserX, Users, GraduationCap, Calendar, BookOpen, Image, Mail, ClipboardList, DollarSign, FileText, Clock, Phone, MapPin, Award, Briefcase, Star } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import type { User as UserType, Faculty, Student, Event, Notice, GalleryImage, ContactForm, Timetable, AcademicCalendar, Admission, Payment } from "@shared/schema";
@@ -17,6 +17,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { Separator } from "@/components/ui/separator";
+import { format } from "date-fns";
 
 export default function Dashboard() {
   const [, navigate] = useLocation();
@@ -24,6 +26,16 @@ export default function Dashboard() {
   
   const { data: user, isLoading } = useQuery<UserType | null>({
     queryKey: ["/api/auth/me"],
+  });
+
+  const { data: studentDetails, isLoading: studentLoading } = useQuery<Student | null>({
+    queryKey: ["/api/students", user?.studentId],
+    enabled: !!user?.studentId,
+  });
+
+  const { data: facultyDetails, isLoading: facultyLoading } = useQuery<Faculty | null>({
+    queryKey: ["/api/faculty", user?.facultyId],
+    enabled: !!user?.facultyId,
   });
 
   const { data: pendingUsers = [], isLoading: isPendingLoading } = useQuery<UserType[]>({
@@ -108,58 +120,322 @@ export default function Dashboard() {
           </Button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <Card data-testid="card-profile">
+        {user.approvalStatus === "pending" && (
+          <Card className="bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800 mb-6">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <User className="w-5 h-5" />
-                Profile Information
+              <CardTitle className="text-yellow-800 dark:text-yellow-400">
+                Approval Pending
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-2">
-              <div>
-                <span className="text-sm text-gray-600 dark:text-gray-400">Email:</span>
-                <p className="font-medium" data-testid="user-email">{user.email || "Not provided"}</p>
-              </div>
-              <div>
-                <span className="text-sm text-gray-600 dark:text-gray-400">Phone:</span>
-                <p className="font-medium" data-testid="user-phone">{user.phoneNumber || "Not provided"}</p>
-              </div>
-              <div>
-                <span className="text-sm text-gray-600 dark:text-gray-400">Status:</span>
-                <p className="font-medium capitalize" data-testid="user-status">{user.approvalStatus}</p>
-              </div>
+            <CardContent>
+              <p className="text-sm text-yellow-700 dark:text-yellow-300" data-testid="pending-message">
+                Your account is awaiting approval from management. You will receive access once approved.
+              </p>
             </CardContent>
           </Card>
+        )}
 
-          {user.approvalStatus === "pending" && (
-            <Card className="bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800">
+        {/* Account Details Section */}
+        <div className="mb-8">
+          <h2 className="text-2xl font-bold mb-4" data-testid="section-account-details">Account Details</h2>
+          
+          {user.role === "student" && user.studentId ? (
+            studentLoading ? (
+              <Card>
+                <CardContent className="p-6">
+                  <div className="animate-pulse space-y-4">
+                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
+                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
+                  </div>
+                </CardContent>
+              </Card>
+            ) : studentDetails ? (
+              <Card className="overflow-hidden" data-testid="card-student-details">
+                <CardHeader className="bg-gradient-to-r from-blue-500 to-blue-600 text-white">
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center gap-4">
+                      {studentDetails.photoUrl && (
+                        <img 
+                          src={studentDetails.photoUrl} 
+                          alt={studentDetails.name}
+                          className="w-24 h-24 rounded-full border-4 border-white object-cover"
+                          data-testid="student-photo"
+                        />
+                      )}
+                      <div>
+                        <CardTitle className="text-2xl mb-1" data-testid="student-name">{studentDetails.name}</CardTitle>
+                        <p className="text-blue-100 text-lg" data-testid="student-studentid">Student ID: {studentDetails.studentId}</p>
+                      </div>
+                    </div>
+                    <Badge variant="secondary" className="bg-white text-blue-600" data-testid="badge-student-status">
+                      {studentDetails.status === "current" ? "Current Student" : "Passed Out"}
+                    </Badge>
+                  </div>
+                </CardHeader>
+                <CardContent className="p-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="space-y-4">
+                      <h3 className="text-lg font-semibold flex items-center gap-2">
+                        <User className="w-5 h-5 text-blue-600" />
+                        Personal Information
+                      </h3>
+                      <Separator />
+                      <div>
+                        <span className="text-sm text-gray-600 dark:text-gray-400">Roll Number:</span>
+                        <p className="font-medium" data-testid="student-rollnumber">{studentDetails.rollNumber}</p>
+                      </div>
+                      <div>
+                        <span className="text-sm text-gray-600 dark:text-gray-400">Gender:</span>
+                        <p className="font-medium capitalize" data-testid="student-gender">{studentDetails.gender}</p>
+                      </div>
+                      <div>
+                        <span className="text-sm text-gray-600 dark:text-gray-400">Date of Birth:</span>
+                        <p className="font-medium" data-testid="student-dob">
+                          {format(new Date(studentDetails.dateOfBirth), "PPP")}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="space-y-4">
+                      <h3 className="text-lg font-semibold flex items-center gap-2">
+                        <GraduationCap className="w-5 h-5 text-blue-600" />
+                        Academic Information
+                      </h3>
+                      <Separator />
+                      <div>
+                        <span className="text-sm text-gray-600 dark:text-gray-400">Stream:</span>
+                        <p className="font-medium uppercase" data-testid="student-stream">{studentDetails.stream}</p>
+                      </div>
+                      <div>
+                        <span className="text-sm text-gray-600 dark:text-gray-400">Year:</span>
+                        <p className="font-medium" data-testid="student-year">{studentDetails.year}</p>
+                      </div>
+                      <div>
+                        <span className="text-sm text-gray-600 dark:text-gray-400">Section:</span>
+                        <p className="font-medium uppercase" data-testid="student-section">{studentDetails.section}</p>
+                      </div>
+                      <div>
+                        <span className="text-sm text-gray-600 dark:text-gray-400">Admission Year:</span>
+                        <p className="font-medium" data-testid="student-admission-year">{studentDetails.admissionYear}</p>
+                      </div>
+                      {studentDetails.graduationYear && (
+                        <div>
+                          <span className="text-sm text-gray-600 dark:text-gray-400">Graduation Year:</span>
+                          <p className="font-medium" data-testid="student-graduation-year">{studentDetails.graduationYear}</p>
+                        </div>
+                      )}
+                      {studentDetails.rank && (
+                        <div>
+                          <span className="text-sm text-gray-600 dark:text-gray-400">Rank:</span>
+                          <p className="font-medium flex items-center gap-1" data-testid="student-rank">
+                            <Award className="w-4 h-4 text-yellow-500" />
+                            {studentDetails.rank}
+                          </p>
+                        </div>
+                      )}
+                      {studentDetails.percentage && (
+                        <div>
+                          <span className="text-sm text-gray-600 dark:text-gray-400">Percentage:</span>
+                          <p className="font-medium" data-testid="student-percentage">{studentDetails.percentage}%</p>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="space-y-4">
+                      <h3 className="text-lg font-semibold flex items-center gap-2">
+                        <Phone className="w-5 h-5 text-blue-600" />
+                        Contact Information
+                      </h3>
+                      <Separator />
+                      <div>
+                        <span className="text-sm text-gray-600 dark:text-gray-400">Email:</span>
+                        <p className="font-medium break-words" data-testid="student-email">{studentDetails.email}</p>
+                      </div>
+                      <div>
+                        <span className="text-sm text-gray-600 dark:text-gray-400">Phone:</span>
+                        <p className="font-medium" data-testid="student-contact">{studentDetails.contactNumber}</p>
+                      </div>
+                      <div>
+                        <span className="text-sm text-gray-600 dark:text-gray-400">Address:</span>
+                        <p className="font-medium" data-testid="student-address">{studentDetails.address}</p>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ) : (
+              <Card data-testid="card-basic-profile">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <User className="w-5 h-5" />
+                    Profile Information
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div>
+                    <span className="text-sm text-gray-600 dark:text-gray-400">Full Name:</span>
+                    <p className="font-medium" data-testid="user-fullname">{user.fullName}</p>
+                  </div>
+                  <div>
+                    <span className="text-sm text-gray-600 dark:text-gray-400">Email:</span>
+                    <p className="font-medium" data-testid="user-email">{user.email || "Not provided"}</p>
+                  </div>
+                  <div>
+                    <span className="text-sm text-gray-600 dark:text-gray-400">Phone:</span>
+                    <p className="font-medium" data-testid="user-phone">{user.phoneNumber || "Not provided"}</p>
+                  </div>
+                  <div>
+                    <span className="text-sm text-gray-600 dark:text-gray-400">Account Status:</span>
+                    <p className="font-medium capitalize" data-testid="user-status">{user.approvalStatus}</p>
+                  </div>
+                </CardContent>
+              </Card>
+            )
+          ) : user.role === "teacher" && user.facultyId ? (
+            facultyLoading ? (
+              <Card>
+                <CardContent className="p-6">
+                  <div className="animate-pulse space-y-4">
+                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
+                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
+                  </div>
+                </CardContent>
+              </Card>
+            ) : facultyDetails ? (
+              <Card className="overflow-hidden" data-testid="card-faculty-details">
+                <CardHeader className="bg-gradient-to-r from-green-500 to-green-600 text-white">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <CardTitle className="text-2xl mb-1" data-testid="faculty-name">{facultyDetails.name}</CardTitle>
+                      <p className="text-green-100 text-lg" data-testid="faculty-designation">{facultyDetails.designation}</p>
+                    </div>
+                    {facultyDetails.averageRating && parseFloat(facultyDetails.averageRating) > 0 && (
+                      <Badge variant="secondary" className="bg-white text-green-600 flex items-center gap-1" data-testid="badge-faculty-rating">
+                        <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                        {parseFloat(facultyDetails.averageRating).toFixed(1)}
+                      </Badge>
+                    )}
+                  </div>
+                </CardHeader>
+                <CardContent className="p-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="space-y-4">
+                      <h3 className="text-lg font-semibold flex items-center gap-2">
+                        <Briefcase className="w-5 h-5 text-green-600" />
+                        Professional Information
+                      </h3>
+                      <Separator />
+                      <div>
+                        <span className="text-sm text-gray-600 dark:text-gray-400">Department:</span>
+                        <p className="font-medium" data-testid="faculty-department">{facultyDetails.departmentId || "Not assigned"}</p>
+                      </div>
+                      <div>
+                        <span className="text-sm text-gray-600 dark:text-gray-400">Subject:</span>
+                        <p className="font-medium" data-testid="faculty-subject">{facultyDetails.subject || "Not specified"}</p>
+                      </div>
+                      <div>
+                        <span className="text-sm text-gray-600 dark:text-gray-400">Specialization:</span>
+                        <p className="font-medium" data-testid="faculty-specialization">{facultyDetails.specialization || "Not specified"}</p>
+                      </div>
+                      {facultyDetails.rankPosition && (
+                        <div>
+                          <span className="text-sm text-gray-600 dark:text-gray-400">Rank Position:</span>
+                          <p className="font-medium flex items-center gap-1" data-testid="faculty-rank">
+                            <Award className="w-4 h-4 text-yellow-500" />
+                            {facultyDetails.rankPosition}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="space-y-4">
+                      <h3 className="text-lg font-semibold flex items-center gap-2">
+                        <BookOpen className="w-5 h-5 text-green-600" />
+                        Qualifications
+                      </h3>
+                      <Separator />
+                      <div>
+                        <span className="text-sm text-gray-600 dark:text-gray-400">Qualification:</span>
+                        <p className="font-medium" data-testid="faculty-qualification">{facultyDetails.qualification}</p>
+                      </div>
+                      {facultyDetails.experience && (
+                        <div>
+                          <span className="text-sm text-gray-600 dark:text-gray-400">Experience:</span>
+                          <p className="font-medium" data-testid="faculty-experience">{facultyDetails.experience} years</p>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="space-y-4">
+                      <h3 className="text-lg font-semibold flex items-center gap-2">
+                        <Phone className="w-5 h-5 text-green-600" />
+                        Contact Information
+                      </h3>
+                      <Separator />
+                      <div>
+                        <span className="text-sm text-gray-600 dark:text-gray-400">Email:</span>
+                        <p className="font-medium break-words" data-testid="faculty-email">{facultyDetails.email || user.email || "Not provided"}</p>
+                      </div>
+                      <div>
+                        <span className="text-sm text-gray-600 dark:text-gray-400">Phone:</span>
+                        <p className="font-medium" data-testid="faculty-phone">{facultyDetails.phone || user.phoneNumber || "Not provided"}</p>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ) : (
+              <Card data-testid="card-basic-profile">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <User className="w-5 h-5" />
+                    Profile Information
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div>
+                    <span className="text-sm text-gray-600 dark:text-gray-400">Full Name:</span>
+                    <p className="font-medium" data-testid="user-fullname">{user.fullName}</p>
+                  </div>
+                  <div>
+                    <span className="text-sm text-gray-600 dark:text-gray-400">Email:</span>
+                    <p className="font-medium" data-testid="user-email">{user.email || "Not provided"}</p>
+                  </div>
+                  <div>
+                    <span className="text-sm text-gray-600 dark:text-gray-400">Phone:</span>
+                    <p className="font-medium" data-testid="user-phone">{user.phoneNumber || "Not provided"}</p>
+                  </div>
+                  <div>
+                    <span className="text-sm text-gray-600 dark:text-gray-400">Account Status:</span>
+                    <p className="font-medium capitalize" data-testid="user-status">{user.approvalStatus}</p>
+                  </div>
+                </CardContent>
+              </Card>
+            )
+          ) : (
+            <Card data-testid="card-basic-profile">
               <CardHeader>
-                <CardTitle className="text-yellow-800 dark:text-yellow-400">
-                  Approval Pending
+                <CardTitle className="flex items-center gap-2">
+                  <User className="w-5 h-5" />
+                  Profile Information
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                <p className="text-sm text-yellow-700 dark:text-yellow-300" data-testid="pending-message">
-                  Your account is awaiting approval from management. You will receive access once approved.
-                </p>
-              </CardContent>
-            </Card>
-          )}
-
-          {user.role === "student" && user.studentId && (
-            <Card className="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
-              <CardHeader>
-                <CardTitle className="text-blue-800 dark:text-blue-400">
-                  Student Information
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
+              <CardContent className="space-y-3">
                 <div>
-                  <span className="text-sm text-blue-700 dark:text-blue-300">Student ID:</span>
-                  <p className="font-bold text-lg text-blue-900 dark:text-blue-100" data-testid="student-id">
-                    {user.studentId}
-                  </p>
+                  <span className="text-sm text-gray-600 dark:text-gray-400">Full Name:</span>
+                  <p className="font-medium" data-testid="user-fullname">{user.fullName}</p>
+                </div>
+                <div>
+                  <span className="text-sm text-gray-600 dark:text-gray-400">Email:</span>
+                  <p className="font-medium" data-testid="user-email">{user.email || "Not provided"}</p>
+                </div>
+                <div>
+                  <span className="text-sm text-gray-600 dark:text-gray-400">Phone:</span>
+                  <p className="font-medium" data-testid="user-phone">{user.phoneNumber || "Not provided"}</p>
+                </div>
+                <div>
+                  <span className="text-sm text-gray-600 dark:text-gray-400">Account Status:</span>
+                  <p className="font-medium capitalize" data-testid="user-status">{user.approvalStatus}</p>
                 </div>
               </CardContent>
             </Card>
