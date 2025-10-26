@@ -1,0 +1,60 @@
+Prompt 1: Role-Based Profile Display After Login
+
+Objective:
+Develop dynamic post-login routing that renders distinct dashboards based on user type (e.g., Student, Teacher, Admin).
+
+Prompt Script:
+
+“Implement a login validation system that redirects users to a role-specific profile view. Create different profile templates for each user type. If the profile UI does not exist, generate basic placeholder templates with dummy data and role-specific UI placeholders (cards, stats, activity summary). Use React (or Flask templating if using Python backend) for rendering. Example user roles: student, teacher, admin. Ensure secure role verification via backend session tokens.”
+
+Expected Deliverables:
+
+Authentication logic with session/token management.
+
+Redirect routes: /student-dashboard, /teacher-dashboard, /admin-dashboard.
+
+Placeholder components for profiles (StudentProfile.jsx, TeacherProfile.jsx, AdminProfile.jsx).
+
+Conditional rendering using role context or JWT payload.
+
+Prompt 2: Admin Workflow Development & Website Management Panel
+
+Objective:
+Design and implement a robust Admin Control Panel with functional workflows for institutional management and student operations.
+
+Prompt Script:
+
+“Develop an Admin Dashboard for managing institutional data and website updates. Admin can:
+
+Approve or reject student registrations.
+
+Update fee structures dynamically (CRUD operations with backend integration).
+
+Modify and publish class timetables.
+
+Manage Notice Board entries (create, edit, delete).
+
+Upload PDFs (study materials, circulars, etc.) to a storage directory or cloud bucket.
+
+Trigger real-time updates for public-facing website components (e.g., notices, timetables, results).
+Build the dashboard UI with modular cards and tables for each task category. Each function should interact with API endpoints connected to your database layer (e.g., Firebase, Supabase, or a Flask API). Implement access control so only the admin role can view or modify these resources.”
+
+Expected Deliverables:
+
+Admin Dashboard route: /admin-panel.
+
+Functional components:
+
+ApproveStudents.jsx
+
+FeeManagement.jsx
+
+TimetableManager.jsx
+
+NoticeBoardManager.jsx
+
+FileUploader.jsx
+
+Backend endpoints for each module (POST, PUT, DELETE, GET).
+
+Automatic front-end refresh via WebSocket or polling for live updates.
