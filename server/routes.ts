@@ -66,7 +66,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        sameSite: "strict", // CSRF protection
+        sameSite: "lax", // Better compatibility while maintaining security
       },
     })
   );
@@ -204,8 +204,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Account not yet approved. Please wait for management approval." });
       }
       
-      // Set session
+      // Set session and save explicitly
       req.session.userId = user.id;
+      
+      // Save session before responding
+      await new Promise<void>((resolve, reject) => {
+        req.session.save((err) => {
+          if (err) reject(err);
+          else resolve();
+        });
+      });
       
       // Remove password from response
       const { password, ...userWithoutPassword } = user;
