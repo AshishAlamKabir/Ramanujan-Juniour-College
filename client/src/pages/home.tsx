@@ -71,7 +71,7 @@ export default function Home() {
         <div className="absolute inset-0 bg-black/20"></div>
         <div className="relative">
           {/* Hero Content */}
-          <div className="container mx-auto px-4 py-12 text-center pl-[1px] pr-[1px] pt-[0px] pb-[0px]">
+          <div className="container mx-auto px-4 py-12 text-center">
             <h2 className="text-3xl md:text-5xl font-bold mb-2 font-serif" data-testid="college-name">
               Ramanujan Junior College
             </h2>
@@ -84,6 +84,7 @@ export default function Home() {
           </div>
         </div>
       </section>
+
       {/* Two Column Layout: Principal's Desk + Achievements */}
       <section className="py-8 bg-background">
         <div className="container mx-auto px-4">
@@ -196,6 +197,7 @@ export default function Home() {
           </div>
         </div>
       </section>
+
       {/* Three Column Cards: Notice Board, Events, Quick Links */}
       <section className="py-8 bg-muted">
         <div className="container mx-auto px-4">
