@@ -6,11 +6,9 @@ import { z } from "zod";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
-const JWT_SECRET = process.env.JWT_SECRET;
-
-if (!JWT_SECRET) {
+const JWT_SECRET: string = process.env.JWT_SECRET || (() => {
   throw new Error("JWT_SECRET environment variable is required. Please set it in your environment.");
-}
+})();
 
 // Extend Express Request to include authenticated user
 declare global {
